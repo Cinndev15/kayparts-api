@@ -97,11 +97,11 @@ router.patch('/products/:id', upload.array('images'), productController.update);
 router.delete('/products/:id', productController.destroy);
 
 // Generic Admin Resources
-registerResource('categories', genericCrudController(Category, ['name', 'slug'], [], true, 'categories'), createUploadMiddleware('categories'));
-registerResource('subcategories', genericCrudController(Subcategory, ['name', 'slug'], [{ model: Category, as: 'category' }], true, 'subcategories'), createUploadMiddleware('subcategories'));
-registerResource('sub-categories', genericCrudController(Subcategory, ['name', 'slug'], [{ model: Category, as: 'category' }], true, 'subcategories'), createUploadMiddleware('subcategories')); // Alias
+registerResource('categories', genericCrudController(Category, ['name'], [], false, 'categories'), createUploadMiddleware('categories'));
+registerResource('subcategories', genericCrudController(Subcategory, ['name'], [{ model: Category, as: 'category' }], false, 'subcategories'), createUploadMiddleware('subcategories'));
+registerResource('sub-categories', genericCrudController(Subcategory, ['name'], [{ model: Category, as: 'category' }], false, 'subcategories'), createUploadMiddleware('subcategories')); // Alias
 registerResource('brands', genericCrudController(Brand, ['name'], [], false, 'brands'), createUploadMiddleware('brands'));
-registerResource('product-brands', genericCrudController(ProductBrand, ['name', 'slug'], [], true, 'product_brands'), createUploadMiddleware('product_brands'));
+registerResource('product-brands', genericCrudController(ProductBrand, ['name'], [], false, 'product_brands'), createUploadMiddleware('product_brands'));
 registerResource('vehicle-models', genericCrudController(VehicleModel, ['name'], [{ model: Brand, as: 'brand' }], false, 'vehicle_models'), createUploadMiddleware('vehicle_models'));
 registerResource('taxes', genericCrudController(Tax, ['name'], [], false));
 registerResource('vehicle-years', genericCrudController(VehicleYear, ['year'], [], false));

@@ -15,11 +15,6 @@ const Subcategory = sequelize.define('Subcategory', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  slug: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
   description: {
     type: DataTypes.TEXT,
     allowNull: true,
@@ -27,10 +22,6 @@ const Subcategory = sequelize.define('Subcategory', {
   image_path: {
     type: DataTypes.STRING,
     allowNull: true,
-  },
-  is_active: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true,
   },
 }, {
   tableName: 'subcategories',

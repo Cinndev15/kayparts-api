@@ -11,10 +11,6 @@ const ProductBrand = sequelize.define('ProductBrand', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  slug: {
-    type: DataTypes.STRING,
-    allowNull: true, // Slugs are optional or auto-generated
-  },
   description: {
     type: DataTypes.TEXT,
     allowNull: true,

@@ -11,11 +11,6 @@ const Category = sequelize.define('Category', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  slug: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
   description: {
     type: DataTypes.TEXT,
     allowNull: true,
@@ -23,10 +18,6 @@ const Category = sequelize.define('Category', {
   image_path: {
     type: DataTypes.STRING,
     allowNull: true,
-  },
-  is_active: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true,
   },
 }, {
   tableName: 'categories',
