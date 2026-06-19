@@ -3,7 +3,7 @@
   "info": {
     "title": "Kayparts Node REST API",
     "version": "2.1",
-    "description": "API documentation for Kayparts ported REST API in Node.js, Express, and MySQL"
+    "description": "Complete API documentation for Kayparts REST API in Node.js, Express, and MySQL"
   },
   "servers": [
     {
@@ -137,6 +137,66 @@
         }
       }
     },
+    "/shop/makes": {
+      "get": {
+        "tags": ["Shop"],
+        "summary": "Get vehicle brands (makes) with active products",
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/shop/models": {
+      "get": {
+        "tags": ["Shop"],
+        "summary": "Get vehicle models with active products",
+        "parameters": [
+          { "name": "make_id", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/shop/years": {
+      "get": {
+        "tags": ["Shop"],
+        "summary": "Get vehicle years with active products",
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/shop/displacements": {
+      "get": {
+        "tags": ["Shop"],
+        "summary": "Get vehicle displacements with active products",
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/shop/categories": {
+      "get": {
+        "tags": ["Shop"],
+        "summary": "Get categories with active products count",
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/shop/vehicle-models/{makeId}": {
+      "get": {
+        "tags": ["Shop"],
+        "summary": "Get vehicle models by make ID",
+        "parameters": [
+          { "name": "makeId", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
     "/checkout/process": {
       "post": {
         "tags": ["Checkout"],
@@ -175,6 +235,38 @@
         }
       }
     },
+    "/workshop-applications": {
+      "post": {
+        "tags": ["Workshop Applications"],
+        "summary": "Submit a workshop application",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["workshop_name", "owner_name", "email", "phone", "department", "city", "address"],
+                "properties": {
+                  "workshop_name": { "type": "string" },
+                  "nit": { "type": "string" },
+                  "owner_name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "phone": { "type": "string" },
+                  "department": { "type": "string" },
+                  "city": { "type": "string" },
+                  "address": { "type": "string" },
+                  "specialties": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Application submitted successfully" },
+          "422": { "description": "Validation error" }
+        }
+      }
+    },
     "/geo/departments": {
       "get": {
         "tags": ["Geography"],
@@ -194,6 +286,137 @@
         "responses": {
           "200": { "description": "Success" }
         }
+      }
+    },
+    "/selects/categories": {
+      "get": {
+        "tags": ["Select Options"],
+        "summary": "Get categories for selects dropdowns",
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/selects/product-brands": {
+      "get": {
+        "tags": ["Select Options"],
+        "summary": "Get product brands for selects dropdowns",
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/selects/vehicle-brands": {
+      "get": {
+        "tags": ["Select Options"],
+        "summary": "Get vehicle brands for selects dropdowns",
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/selects/vehicle-models": {
+      "get": {
+        "tags": ["Select Options"],
+        "summary": "Get vehicle models for selects dropdowns",
+        "parameters": [
+          { "name": "brand_id", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/selects/vehicle-years": {
+      "get": {
+        "tags": ["Select Options"],
+        "summary": "Get vehicle years for selects dropdowns",
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/selects/vehicle-displacements": {
+      "get": {
+        "tags": ["Select Options"],
+        "summary": "Get vehicle displacements for selects dropdowns",
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "tags": ["Admin Categories"],
+        "summary": "List categories (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "tags": ["Admin Categories"],
+        "summary": "Create category (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/categories/{id}": {
+      "get": {
+        "tags": ["Admin Categories"],
+        "summary": "Get category details (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "put": {
+        "tags": ["Admin Categories"],
+        "summary": "Update category (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Updated" } }
+      },
+      "delete": {
+        "tags": ["Admin Categories"],
+        "summary": "Delete category (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Deleted" } }
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": ["Admin Products"],
+        "summary": "List products (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "tags": ["Admin Products"],
+        "summary": "Create product (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "tags": ["Admin Products"],
+        "summary": "Get product details (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "put": {
+        "tags": ["Admin Products"],
+        "summary": "Update product (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Updated" } }
+      },
+      "delete": {
+        "tags": ["Admin Products"],
+        "summary": "Delete product (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Deleted" } }
       }
     }
   }
