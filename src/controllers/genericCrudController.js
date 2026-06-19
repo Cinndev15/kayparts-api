@@ -1,6 +1,8 @@
 const { Op } = require('sequelize');
+const fs = require('fs');
+const path = require('path');
 
-module.exports = (Model, searchFields = [], defaultIncludes = [], hasSlug = false) => {
+module.exports = (Model, searchFields = [], defaultIncludes = [], hasSlug = false, uploadSubfolder = null) => {
   return {
     index: async (req, res) => {
       try {
@@ -56,6 +58,9 @@ module.exports = (Model, searchFields = [], defaultIncludes = [], hasSlug = fals
         if (hasSlug && data.name && !data.slug) {
           data.slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 7);
         }
+        if (req.file && uploadSubfolder) {
+          data.image_path = `${uploadSubfolder}/${req.file.filename}`;
+        }
         const item = await Model.create(data);
         return res.status(201).json({ data: item });
       } catch (error) {
@@ -73,6 +78,16 @@ module.exports = (Model, searchFields = [], defaultIncludes = [], hasSlug = fals
         if (hasSlug && data.name && data.name !== item.name) {
           data.slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 7);
         }
+        if (req.file && uploadSubfolder) {
+          // Delete old file if it exists to clean up disk space
+          if (item.image_path) {
+            const oldPath = path.join(__dirname, '../../public/uploads', item.image_path);
+            if (fs.existsSync(oldPath)) {
+              fs.unlinkSync(oldPath);
+            }
+          }
+          data.image_path = `${uploadSubfolder}/${req.file.filename}`;
+        }
         await item.update(data);
         return res.json({ data: item });
       } catch (error) {
@@ -85,6 +100,13 @@ module.exports = (Model, searchFields = [], defaultIncludes = [], hasSlug = fals
         const item = await Model.findByPk(req.params.id);
         if (!item) {
           return res.status(404).json({ message: 'Recurso no encontrado' });
+        }
+        // Delete image file if it exists
+        if (item.image_path) {
+          const oldPath = path.join(__dirname, '../../public/uploads', item.image_path);
+          if (fs.existsSync(oldPath)) {
+            fs.unlinkSync(oldPath);
+          }
         }
         await item.destroy();
         return res.json({ message: 'Eliminado con éxito' });
