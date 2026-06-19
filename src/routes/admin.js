@@ -68,9 +68,11 @@ const registerResource = (routePath, controller, uploadMiddleware = null) => {
     if (uploadMiddleware) {
       router.put(`/${routePath}/:id`, uploadMiddleware.single('image'), controller.update);
       router.patch(`/${routePath}/:id`, uploadMiddleware.single('image'), controller.update);
+      router.post(`/${routePath}/:id`, uploadMiddleware.single('image'), controller.update); // Laravel-style method spoofing compatibility
     } else {
       router.put(`/${routePath}/:id`, controller.update);
       router.patch(`/${routePath}/:id`, controller.update);
+      router.post(`/${routePath}/:id`, controller.update); // Laravel-style method spoofing compatibility
     }
   }
   if (controller.destroy) router.delete(`/${routePath}/:id`, controller.destroy);
@@ -94,6 +96,7 @@ router.post('/products', upload.array('images'), productController.store);
 router.get('/products/:id', productController.show);
 router.put('/products/:id', upload.array('images'), productController.update);
 router.patch('/products/:id', upload.array('images'), productController.update);
+router.post('/products/:id', upload.array('images'), productController.update); // Laravel method spoofing compatibility
 router.delete('/products/:id', productController.destroy);
 
 // Generic Admin Resources
