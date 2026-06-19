@@ -1,0 +1,6 @@
+node_modules/
+.env
+.DS_Store
+public/uploads/products/*
+!public/uploads/products/.gitkeep
+database/data/colombia_geo.json
