@@ -147,8 +147,9 @@ const getImageUrl = (imagePath) => {
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
     return imagePath;
   }
-  // Base frontend or asset URL prefixing
-  return `/uploads/${imagePath}`;
+  const baseUrl = process.env.APP_URL || 'https://api.kayparts.co';
+  const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  return `${cleanBase}/uploads/${imagePath}`;
 };
 
 // Add helper properties/methods to models to align output with Laravel
