@@ -8,6 +8,7 @@ const {
   ProductBrand,
   Category,
   Subcategory,
+  Brand,
   VehicleModel,
   VehicleYear,
   VehicleDisplacement,
