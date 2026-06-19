@@ -100,7 +100,7 @@ router.post('/products/:id', upload.array('images'), productController.update); 
 router.delete('/products/:id', productController.destroy);
 
 // Generic Admin Resources
-registerResource('categories', genericCrudController(Category, ['name'], [], false, 'categories'), createUploadMiddleware('categories'));
+registerResource('categories', genericCrudController(Category, ['name', 'slug'], [], true, 'categories'), createUploadMiddleware('categories'));
 registerResource('subcategories', genericCrudController(Subcategory, ['name'], [{ model: Category, as: 'category' }], false, 'subcategories'), createUploadMiddleware('subcategories'));
 registerResource('sub-categories', genericCrudController(Subcategory, ['name'], [{ model: Category, as: 'category' }], false, 'subcategories'), createUploadMiddleware('subcategories')); // Alias
 registerResource('brands', genericCrudController(Brand, ['name'], [], false, 'brands'), createUploadMiddleware('brands'));
