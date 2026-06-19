@@ -135,7 +135,18 @@ exports.store = async (req, res) => {
 
       // Handle uploaded files (images)
       if (req.files && req.files.length > 0) {
-        const labels = typeof image_labels === 'string' ? JSON.parse(image_labels) : (image_labels || []);
+        let labels = [];
+        if (image_labels) {
+          if (typeof image_labels === 'string') {
+            try {
+              labels = JSON.parse(image_labels);
+            } catch (e) {
+              labels = [image_labels];
+            }
+          } else {
+            labels = image_labels;
+          }
+        }
         const pIndex = principal_image_index ? parseInt(principal_image_index) : 0;
 
         for (let index = 0; index < req.files.length; index++) {
@@ -283,7 +294,18 @@ exports.update = async (req, res) => {
 
       // Handle new files upload
       if (req.files && req.files.length > 0) {
-        const labels = typeof image_labels === 'string' ? JSON.parse(image_labels) : (image_labels || []);
+        let labels = [];
+        if (image_labels) {
+          if (typeof image_labels === 'string') {
+            try {
+              labels = JSON.parse(image_labels);
+            } catch (e) {
+              labels = [image_labels];
+            }
+          } else {
+            labels = image_labels;
+          }
+        }
         const pIndex = principal_image_index ? parseInt(principal_image_index) : -1;
 
         if (pIndex !== -1) {
