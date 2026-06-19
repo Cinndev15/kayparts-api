@@ -12,10 +12,6 @@ const VehicleDisplacement = sequelize.define('VehicleDisplacement', {
     allowNull: false,
     unique: true,
   },
-  is_active: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true,
-  },
 }, {
   tableName: 'vehicle_displacements',
 });
