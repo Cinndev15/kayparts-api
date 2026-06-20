@@ -46,8 +46,10 @@ exports.sendResetLinkEmail = async (req, res) => {
       to: email,
       subject: 'Restablecer contraseña - Kayparts',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
-          <h2 style="color: #0f172a; border-bottom: 2px solid #e21a22; padding-bottom: 10px;">Kayparts Industrial</h2>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="font-size: 32px; font-weight: 800; margin: 0; letter-spacing: -1.5px;"><span style="color: #1e293b;">KAY</span><span style="color: #e21a22;">PARTS</span></h1>
+          </div>
           <p style="color: #475569; font-size: 16px; line-height: 1.5;">
             Has solicitado restablecer tu contraseña para acceder a la plataforma administrativa de Kayparts.
           </p>
