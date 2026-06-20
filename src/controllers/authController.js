@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { User, PersonalAccessToken } = require('../models');
+const { Op } = require('sequelize');
 
 // Helper to create Sanctum-compatible token
 async function createSanctumToken(user, tokenName = 'auth_token') {
@@ -247,3 +248,57 @@ exports.handleProviderCallback = async (req, res) => {
     return res.status(500).json({ error: 'Error interno del servidor', details: error.message });
   }
 };
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const user = req.user;
+    const { name, email, phone, password } = req.body;
+
+    if (!name || !email) {
+      return res.status(422).json({
+        message: 'El nombre y email son obligatorios.',
+        errors: {
+          name: !name ? ['El campo nombre es obligatorio.'] : [],
+          email: !email ? ['El campo email es obligatorio.'] : []
+        }
+      });
+    }
+
+    // Check unique email ignoring current user
+    const existing = await User.findOne({
+      where: {
+        email,
+        id: { [Op.ne]: user.id }
+      }
+    });
+
+    if (existing) {
+      return res.status(422).json({
+        message: 'El correo electrónico ya ha sido registrado.',
+        errors: { email: ['El correo electrónico ya ha sido registrado.'] }
+      });
+    }
+
+    const updateData = { name, email, phone };
+    if (password && password.length >= 8) {
+      updateData.password = await bcrypt.hash(password, 12);
+    }
+
+    await user.update(updateData);
+
+    return res.json({
+      message: 'Perfil actualizado exitosamente',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+

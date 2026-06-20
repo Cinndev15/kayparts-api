@@ -8,6 +8,7 @@ const authMiddleware = require('../middleware/auth');
 const authController = require('../controllers/authController');
 const userAddressController = require('../controllers/userAddressController');
 const productController = require('../controllers/productController');
+const userController = require('../controllers/userController');
 const genericCrudController = require('../controllers/genericCrudController');
 
 const {
@@ -83,6 +84,8 @@ router.use(authMiddleware);
 
 // Auth Profile
 router.get('/user', authController.user);
+router.put('/user', authController.updateProfile);
+router.patch('/user', authController.updateProfile);
 router.post('/logout', authController.logout);
 
 // User Addresses
@@ -100,7 +103,7 @@ router.post('/products/:id', upload.array('images'), productController.update); 
 router.delete('/products/:id', productController.destroy);
 
 // Generic Admin Resources
-registerResource('categories', genericCrudController(Category, ['name', 'slug'], [], true, 'categories'), createUploadMiddleware('categories'));
+registerResource('categories', genericCrudController(Category, ['name'], [], false, 'categories'), createUploadMiddleware('categories'));
 registerResource('subcategories', genericCrudController(Subcategory, ['name'], [{ model: Category, as: 'category' }], false, 'subcategories'), createUploadMiddleware('subcategories'));
 registerResource('sub-categories', genericCrudController(Subcategory, ['name'], [{ model: Category, as: 'category' }], false, 'subcategories'), createUploadMiddleware('subcategories')); // Alias
 registerResource('brands', genericCrudController(Brand, ['name'], [], false, 'brands'), createUploadMiddleware('brands'));
@@ -110,8 +113,7 @@ registerResource('taxes', genericCrudController(Tax, ['name'], [], false));
 registerResource('vehicle-years', genericCrudController(VehicleYear, ['year'], [], false));
 registerResource('vehicle-displacements', genericCrudController(VehicleDisplacement, ['name'], [], false));
 
-const userCrud = genericCrudController(User, ['name', 'email'], [{ model: UserAddress, as: 'addresses' }], false);
-registerResource('users', userCrud);
-registerResource('clients', userCrud); // Alias
+registerResource('users', userController);
+registerResource('clients', userController); // Alias
 
 module.exports = router;
