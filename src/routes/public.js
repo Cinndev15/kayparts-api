@@ -49,45 +49,4 @@ router.get('/migrate-models', (req, res) => {
   return res.send('Resultados de la migración de modelos: Node.js database models running successfully.');
 });
 
-const nodemailer = require('nodemailer');
-router.get('/test-email', async (req, res) => {
-  const configs = [
-    { name: 'Port 465 (SSL)', host: 'smtp.hostinger.com', port: 465, secure: true },
-    { name: 'Port 587 (TLS)', host: 'smtp.hostinger.com', port: 587, secure: false }
-  ];
-
-  const results = [];
-  for (const config of configs) {
-    const transporter = nodemailer.createTransport({
-      host: config.host,
-      port: config.port,
-      secure: config.secure,
-      auth: {
-        user: 'soporte@kayparts.co',
-        pass: 'Kayparts2026*'
-      },
-      tls: {
-        rejectUnauthorized: false
-      },
-      connectionTimeout: 5000,
-      greetingTimeout: 5000,
-      socketTimeout: 5000
-    });
-
-    try {
-      await new Promise((resolve, reject) => {
-        transporter.verify((err, success) => {
-          if (err) reject(err);
-          else resolve(success);
-        });
-      });
-      results.push(`✅ ${config.name} connected successfully!`);
-    } catch (err) {
-      results.push(`❌ ${config.name} failed: ${err.message}`);
-    }
-  }
-
-  return res.json({ results });
-});
-
 module.exports = router;
