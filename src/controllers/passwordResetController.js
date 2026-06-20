@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const { sequelize, User } = require('../models');
+const transporter = require('../config/mail');
 
 exports.sendResetLinkEmail = async (req, res) => {
   try {
@@ -37,12 +38,42 @@ exports.sendResetLinkEmail = async (req, res) => {
       }
     );
 
-    // Mock Mail send - log to console / application log (matching original MAIL_MAILER=log)
-    console.log('--------------------------------------------------');
-    console.log(`Reset Password Email Sent to: ${email}`);
-    console.log(`Reset Token: ${token}`);
-    console.log(`Link: ${process.env.FRONTEND_URL || 'https://app.kayparts.co'}/reset-password?token=${token}&email=${encodeURIComponent(email)}`);
-    console.log('--------------------------------------------------');
+    const frontendUrl = process.env.FRONTEND_URL || 'https://app.kayparts.co';
+    const resetLink = `${frontendUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+
+    const mailOptions = {
+      from: `"Soporte Kayparts" <${process.env.MAIL_FROM_ADDRESS || process.env.MAIL_USERNAME || 'soporte@kayparts.co'}>`,
+      to: email,
+      subject: 'Restablecer contraseña - Kayparts',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <h2 style="color: #0f172a; border-bottom: 2px solid #e21a22; padding-bottom: 10px;">Kayparts Industrial</h2>
+          <p style="color: #475569; font-size: 16px; line-height: 1.5;">
+            Has solicitado restablecer tu contraseña para acceder a la plataforma administrativa de Kayparts.
+          </p>
+          <p style="color: #475569; font-size: 16px; line-height: 1.5; margin-bottom: 24px;">
+            Haz clic en el siguiente enlace para crear una nueva contraseña. Este enlace expira pronto:
+          </p>
+          <div style="text-align: center; margin-bottom: 24px;">
+            <a href="${resetLink}" style="background-color: #e21a22; color: #ffffff; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 6px; display: inline-block;">
+              Restablecer Contraseña
+            </a>
+          </div>
+          <p style="color: #64748b; font-size: 14px;">
+            Si el botón no funciona, copia y pega la siguiente URL en tu navegador:
+          </p>
+          <p style="word-break: break-all; color: #e21a22; font-size: 13px; font-family: monospace;">
+            ${resetLink}
+          </p>
+          <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 24px 0;" />
+          <p style="color: #94a3b8; font-size: 12px; text-align: center;">
+            Este es un correo automático, por favor no respondas a este mensaje.
+          </p>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
 
     return res.json({
       message: 'Hemos enviado por correo electrónico el enlace para restablecer tu contraseña.'
