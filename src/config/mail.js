@@ -8,7 +8,13 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.MAIL_USERNAME || 'soporte@kayparts.co',
     pass: process.env.MAIL_PASSWORD
-  }
+  },
+  tls: {
+    rejectUnauthorized: false
+  },
+  connectionTimeout: 10000, // 10 seconds timeout
+  greetingTimeout: 10000,
+  socketTimeout: 10000
 });
 
 // Verification to ensure transporter is correctly configured
