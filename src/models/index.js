@@ -189,6 +189,48 @@ VehicleModel.prototype.toJSON = function () {
   return values;
 };
 
+Product.prototype.toJSON = function () {
+  const values = Object.assign({}, this.get());
+
+  // Format nested images if present
+  if (values.images && Array.isArray(values.images)) {
+    values.images = this.images.map(img => img.toJSON ? img.toJSON() : img);
+  }
+  if (values.principalImage) {
+    values.principalImage = this.principalImage.toJSON ? this.principalImage.toJSON() : values.principalImage;
+  }
+  
+  // Set main_image to match Laravel API output format
+  if (values.principalImage) {
+    values.main_image = values.principalImage.image_url;
+  } else if (values.images && values.images.length > 0) {
+    const primary = values.images.find(img => img.is_primary || img.is_principal);
+    if (primary) {
+      values.main_image = primary.image_url;
+    } else {
+      values.main_image = values.images[0].image_url;
+    }
+  } else {
+    values.main_image = null;
+  }
+
+  // Format other associations if present
+  if (values.brand && this.brand && this.brand.toJSON) {
+    values.brand = this.brand.toJSON();
+  }
+  if (values.category && this.category && this.category.toJSON) {
+    values.category = this.category.toJSON();
+  }
+  if (values.subcategory && this.subcategory && this.subcategory.toJSON) {
+    values.subcategory = this.subcategory.toJSON();
+  }
+  if (values.vehicleModels && Array.isArray(values.vehicleModels)) {
+    values.vehicleModels = this.vehicleModels.map(m => m.toJSON ? m.toJSON() : m);
+  }
+
+  return values;
+};
+
 module.exports = {
   sequelize,
   User,

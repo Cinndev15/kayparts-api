@@ -23,6 +23,11 @@ const ProductImage = sequelize.define('ProductImage', {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  order: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
 }, {
   tableName: 'product_images',
 });
