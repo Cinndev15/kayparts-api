@@ -40,6 +40,8 @@ exports.sendResetLinkEmail = async (req, res) => {
 
     const frontendUrl = process.env.FRONTEND_URL || 'https://app.kayparts.co';
     const resetLink = `${frontendUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+    const apiUrl = process.env.APP_URL || 'https://api.kayparts.co';
+    const logoUrl = `${apiUrl}/uploads/app/kayparts.png`;
 
     const mailOptions = {
       from: `"Soporte Kayparts" <${process.env.MAIL_FROM_ADDRESS || process.env.MAIL_USERNAME || 'soporte@kayparts.co'}>`,
@@ -48,7 +50,7 @@ exports.sendResetLinkEmail = async (req, res) => {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="font-size: 32px; font-weight: 800; margin: 0; letter-spacing: -1.5px;"><span style="color: #1e293b;">KAY</span><span style="color: #e21a22;">PARTS</span></h1>
+            <img src="${logoUrl}" alt="Kayparts" style="max-height: 50px; display: inline-block; border: 0;" />
           </div>
           <p style="color: #475569; font-size: 16px; line-height: 1.5;">
             Has solicitado restablecer tu contraseña para acceder a la plataforma administrativa de Kayparts.
