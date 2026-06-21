@@ -19,3 +19,22 @@ exports.getUserOrders = async (req, res) => {
     return res.status(500).json({ message: 'Error interno del servidor.' });
   }
 };
+
+exports.index = async (req, res) => {
+  try {
+    const orders = await Order.findAll({
+      include: [
+        {
+          model: OrderItem,
+          as: 'items'
+        }
+      ],
+      order: [['created_at', 'DESC']]
+    });
+    
+    return res.status(200).json({ data: orders });
+  } catch (error) {
+    console.error('Error fetching all orders:', error);
+    return res.status(500).json({ message: 'Error interno del servidor.' });
+  }
+};
