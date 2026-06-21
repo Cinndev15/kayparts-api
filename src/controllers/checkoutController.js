@@ -87,16 +87,78 @@ exports.process = async (req, res) => {
         transaction: t
       });
 
+      let payment_link_url = null;
+
+      if (payment_method === 'card') {
+        const apiKey = process.env.BOLD_API_KEY;
+        if (!apiKey) {
+          throw new Error('La integración de pagos no está configurada correctamente.');
+        }
+
+        // Bold requires taxes specifically formatted
+        const boldTaxes = [];
+        if (taxAmount > 0) {
+          // Simplification: we put all calculated tax in a single VAT block
+          // For a real integration, we might want to pass taxes per item, but bold accepts transaction total taxes.
+          boldTaxes.push({
+            type: "VAT",
+            base: Math.round((totalAmount - taxAmount) * 100) / 100, // Two decimals max base
+            value: Math.round(taxAmount * 100) / 100
+          });
+        }
+
+        const boldPayload = {
+          amount_type: "CLOSE",
+          amount: {
+            currency: "COP",
+            total_amount: Math.round(totalAmount), // Bold expects integer or float, documentation says example: 10000
+            tip_amount: 0
+          },
+          reference: orderNumber,
+          description: `Pedido ${orderNumber} en KAYPARTS`,
+          callback_url: `https://kayparts.co/`, // Redirigir al inicio por ahora (o a una ruta /success en web)
+          payer_email: customer_email
+        };
+
+        if (boldTaxes.length > 0) {
+           boldPayload.amount.taxes = boldTaxes;
+        }
+
+        const fetch = (await import('node-fetch')).default;
+
+        const boldRes = await fetch('https://integrations.api.bold.co/online/link/v1', {
+          method: 'POST',
+          headers: {
+            'Authorization': `x-api-key ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(boldPayload)
+        });
+
+        if (!boldRes.ok) {
+          const errData = await boldRes.text();
+          console.error("Error Bold API:", errData);
+          throw new Error('No se pudo generar el enlace de pago con Bold.');
+        }
+
+        const boldData = await boldRes.json();
+        if (boldData && boldData.payload && boldData.payload.url) {
+           payment_link_url = boldData.payload.url;
+        } else {
+           throw new Error('La pasarela de pago devolvió una respuesta inválida.');
+        }
+      }
+
       return {
         message: 'Orden creada exitosamente',
         order: orderWithItems,
-        bold_hash: order.generateBoldHash(),
-        bold_currency: 'COP',
+        payment_link_url: payment_link_url
       };
     });
 
     return res.status(201).json(result);
   } catch (error) {
+    console.error("Checkout Error:", error);
     return res.status(422).json({
       message: 'Error al procesar el checkout: ' + error.message
     });
