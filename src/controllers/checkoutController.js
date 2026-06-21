@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const { sequelize, Order, OrderItem, Product, Tax } = require('../models');
 
 exports.process = async (req, res) => {
-  const { items, customer_name, customer_email, customer_phone, shipping_address } = req.body;
+  const { items, customer_name, customer_email, customer_phone, shipping_address, payment_method } = req.body;
 
   if (!items || !Array.isArray(items) || items.length === 0) {
     return res.status(422).json({ message: 'Los items son requeridos.' });
@@ -71,8 +71,8 @@ exports.process = async (req, res) => {
         status: 'pending',
         customer_name,
         customer_email,
-        customer_phone,
         shipping_address,
+        payment_method,
       }, { transaction: t });
 
       // Create Order Items

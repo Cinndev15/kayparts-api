@@ -7,6 +7,7 @@ const fs = require('fs');
 const authMiddleware = require('../middleware/auth');
 const authController = require('../controllers/authController');
 const userAddressController = require('../controllers/userAddressController');
+const orderController = require('../controllers/orderController');
 const productController = require('../controllers/productController');
 const userController = require('../controllers/userController');
 const genericCrudController = require('../controllers/genericCrudController');
@@ -92,6 +93,9 @@ router.post('/logout', authController.logout);
 router.post('/user/addresses', userAddressController.store);
 router.patch('/addresses/:id/primary', userAddressController.setPrimary);
 registerResource('addresses', userAddressController);
+
+// User Orders
+router.get('/user/orders', orderController.getUserOrders);
 
 // Product Resource (needs multer upload for store/update)
 router.get('/products', productController.index);
