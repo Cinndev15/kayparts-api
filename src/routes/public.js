@@ -7,7 +7,9 @@ const checkoutController = require('../controllers/checkoutController');
 const boldWebhookController = require('../controllers/boldWebhookController');
 const workshopApplicationController = require('../controllers/workshopApplicationController');
 
-router.post('/checkout/process', checkoutController.process);
+const optionalAuthMiddleware = require('../middleware/optionalAuth');
+
+router.post('/checkout/process', optionalAuthMiddleware, checkoutController.process);
 router.post('/webhooks/bold', boldWebhookController.handle);
 router.post('/workshop-applications', workshopApplicationController.store);
 
