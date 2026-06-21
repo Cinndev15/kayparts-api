@@ -19,6 +19,7 @@ const Order = require('./Order');
 const OrderItem = require('./OrderItem');
 const Carrier = require('./Carrier');
 const Dispatch = require('./Dispatch');
+const DispatchTracking = require('./DispatchTracking');
 
 // User and Token
 User.hasMany(PersonalAccessToken, { foreignKey: 'tokenable_id', constraints: false, scope: { tokenable_type: 'App\\Models\\User' } });
@@ -47,6 +48,10 @@ Dispatch.belongsTo(Order, { foreignKey: 'order_id', as: 'order' });
 // Carrier and Dispatch
 Carrier.hasMany(Dispatch, { foreignKey: 'carrier_id', as: 'dispatches' });
 Dispatch.belongsTo(Carrier, { foreignKey: 'carrier_id', as: 'carrier' });
+
+// Dispatch and DispatchTracking
+Dispatch.hasMany(DispatchTracking, { foreignKey: 'dispatch_id', as: 'trackingHistory' });
+DispatchTracking.belongsTo(Dispatch, { foreignKey: 'dispatch_id', as: 'dispatch' });
 
 // Category and Subcategory
 Category.hasMany(Subcategory, { foreignKey: 'category_id', as: 'subcategories' });
@@ -263,4 +268,5 @@ module.exports = {
   OrderItem,
   Carrier,
   Dispatch,
+  DispatchTracking,
 };

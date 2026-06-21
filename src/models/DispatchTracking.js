@@ -1,44 +1,32 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const Dispatch = sequelize.define('Dispatch', {
+const DispatchTracking = sequelize.define('DispatchTracking', {
   id: {
     type: DataTypes.BIGINT.UNSIGNED,
     primaryKey: true,
     autoIncrement: true,
   },
-  order_id: {
+  dispatch_id: {
     type: DataTypes.BIGINT.UNSIGNED,
-    allowNull: false,
-  },
-  carrier_id: {
-    type: DataTypes.BIGINT.UNSIGNED,
-    allowNull: false,
-  },
-  tracking_number: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  responsible_person: {
-    type: DataTypes.STRING,
     allowNull: false,
   },
   status: {
     type: DataTypes.ENUM('recibido', 'alistamiento', 'despachado', 'en_transito', 'entregado', 'devuelto', 'cancelado'),
-    defaultValue: 'recibido',
+    allowNull: false,
   },
-  dispatch_date: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
-  notes: {
+  description: {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  location: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 }, {
-  tableName: 'dispatches',
+  tableName: 'dispatch_trackings',
   timestamps: true,
   underscored: true,
 });
 
-module.exports = Dispatch;
+module.exports = DispatchTracking;

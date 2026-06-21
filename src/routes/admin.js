@@ -12,6 +12,7 @@ const productController = require('../controllers/productController');
 const userController = require('../controllers/userController');
 const genericCrudController = require('../controllers/genericCrudController');
 const dispatchController = require('../controllers/dispatchController');
+const dispatchTrackingController = require('../controllers/dispatchTrackingController');
 
 const {
   Category,
@@ -122,6 +123,11 @@ registerResource('vehicle-years', genericCrudController(VehicleYear, ['year'], [
 registerResource('vehicle-displacements', genericCrudController(VehicleDisplacement, ['name'], [], false));
 registerResource('carriers', genericCrudController(Carrier, ['name'], [], false));
 registerResource('dispatches', dispatchController);
+
+// Dispatch Tracking routes
+router.get('/dispatches/:dispatchId/tracking', dispatchTrackingController.index);
+router.post('/dispatches/:dispatchId/tracking', dispatchTrackingController.store);
+router.delete('/dispatches/tracking/:id', dispatchTrackingController.destroy);
 
 registerResource('users', userController);
 registerResource('clients', userController); // Alias

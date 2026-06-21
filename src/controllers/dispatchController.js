@@ -1,4 +1,4 @@
-const { Dispatch, Order, Carrier } = require('../models');
+const { Dispatch, Order, Carrier, DispatchTracking } = require('../models');
 const { Op } = require('sequelize');
 
 exports.index = async (req, res) => {
@@ -23,7 +23,8 @@ exports.index = async (req, res) => {
       where,
       include: [
         { model: Carrier, as: 'carrier' },
-        { model: Order, as: 'order' }
+        { model: Order, as: 'order' },
+        { model: DispatchTracking, as: 'trackingHistory' }
       ],
       limit,
       offset,
@@ -50,7 +51,8 @@ exports.show = async (req, res) => {
     const dispatch = await Dispatch.findByPk(req.params.id, {
       include: [
         { model: Carrier, as: 'carrier' },
-        { model: Order, as: 'order' }
+        { model: Order, as: 'order' },
+        { model: DispatchTracking, as: 'trackingHistory' }
       ]
     });
     if (!dispatch) {
@@ -82,20 +84,25 @@ exports.store = async (req, res) => {
       return res.status(404).json({ message: 'La transportadora especificada no existe.' });
     }
 
+    const currentStatus = status || 'recibido';
+
     const dispatch = await Dispatch.create({
       order_id,
       carrier_id,
       tracking_number,
       responsible_person,
-      status: status || 'pending',
+      status: currentStatus,
       dispatch_date: dispatch_date || new Date(),
       notes
     });
 
-    // Optionally update the Order status if dispatch status is shipped
-    if (status === 'shipped') {
-      await order.update({ status: 'processing' }); // Or standard status mapping
-    }
+    // Create initial tracking record
+    await DispatchTracking.create({
+      dispatch_id: dispatch.id,
+      status: currentStatus,
+      description: 'El despacho ha sido creado e ingresado al sistema.',
+      location: 'Bodega Principal'
+    });
 
     return res.status(201).json({ data: dispatch });
   } catch (error) {
@@ -126,6 +133,8 @@ exports.update = async (req, res) => {
       }
     }
 
+    const oldStatus = dispatch.status;
+
     await dispatch.update({
       order_id: order_id || dispatch.order_id,
       carrier_id: carrier_id || dispatch.carrier_id,
@@ -135,6 +144,16 @@ exports.update = async (req, res) => {
       dispatch_date: dispatch_date || dispatch.dispatch_date,
       notes: notes !== undefined ? notes : dispatch.notes
     });
+
+    // If status changed, create a new tracking milestone
+    if (status && status !== oldStatus) {
+      await DispatchTracking.create({
+        dispatch_id: dispatch.id,
+        status,
+        description: `El estado del despacho ha sido cambiado a: ${status}.`,
+        location: 'Tránsito'
+      });
+    }
 
     return res.json({ data: dispatch });
   } catch (error) {

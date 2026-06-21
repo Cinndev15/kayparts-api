@@ -496,7 +496,7 @@
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "name": "search", "in": "query", "schema": { "type": "string" } },
-          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["pending", "shipped", "delivered", "returned"] } }
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["recibido", "alistamiento", "despachado", "en_transito", "entregado", "devuelto", "cancelado"] } }
         ],
         "responses": { "200": { "description": "Success" } }
       },
@@ -516,9 +516,9 @@
                   "carrier_id": { "type": "integer", "example": 1 },
                   "tracking_number": { "type": "string", "example": "ENV123456789" },
                   "responsible_person": { "type": "string", "example": "Carlos Perez" },
-                  "status": { "type": "string", "enum": ["pending", "shipped", "delivered", "returned"], "example": "pending" },
+                  "status": { "type": "string", "enum": ["recibido", "alistamiento", "despachado", "en_transito", "entregado", "devuelto", "cancelado"], "example": "recibido" },
                   "dispatch_date": { "type": "string", "format": "date-time", "example": "2026-06-21T15:00:00Z" },
-                  "notes": { "type": "string", "example": "Delivered to reception." }
+                  "notes": { "type": "string", "example": "Created dispatch" }
                 }
               }
             }
@@ -551,7 +551,7 @@
                   "carrier_id": { "type": "integer" },
                   "tracking_number": { "type": "string" },
                   "responsible_person": { "type": "string" },
-                  "status": { "type": "string", "enum": ["pending", "shipped", "delivered", "returned"] },
+                  "status": { "type": "string", "enum": ["recibido", "alistamiento", "despachado", "en_transito", "entregado", "devuelto", "cancelado"] },
                   "dispatch_date": { "type": "string", "format": "date-time" },
                   "notes": { "type": "string" }
                 }
@@ -567,6 +567,38 @@
         "security": [{ "bearerAuth": [] }],
         "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
         "responses": { "200": { "description": "Deleted" } }
+      }
+    },
+    "/dispatches/{dispatchId}/tracking": {
+      "get": {
+        "tags": ["Admin Dispatches"],
+        "summary": "Get dispatch tracking milestones (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "dispatchId", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "tags": ["Admin Dispatches"],
+        "summary": "Create dispatch tracking milestone (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "dispatchId", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["status"],
+                "properties": {
+                  "status": { "type": "string", "enum": ["recibido", "alistamiento", "despachado", "en_transito", "entregado", "devuelto", "cancelado"], "example": "alistamiento" },
+                  "description": { "type": "string", "example": "El pedido está siendo embalado." },
+                  "location": { "type": "string", "example": "Bodega Principal" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created" } }
       }
     }
   }
