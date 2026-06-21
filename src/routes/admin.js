@@ -99,6 +99,7 @@ registerResource('addresses', userAddressController);
 // User Orders
 router.get('/user/orders', orderController.getUserOrders);
 router.get('/orders', orderController.index);
+router.put('/orders/:id/status', orderController.updateStatus);
 
 // Product Resource (needs multer upload for store/update)
 router.get('/products', productController.index);

@@ -38,3 +38,24 @@ exports.index = async (req, res) => {
     return res.status(500).json({ message: 'Error interno del servidor.' });
   }
 };
+
+exports.updateStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const validStatuses = ['pending', 'processing', 'paid', 'failed', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(422).json({ message: 'Estado de pedido no válido.' });
+    }
+
+    const order = await Order.findByPk(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Pedido no encontrado.' });
+    }
+
+    await order.update({ status });
+    return res.status(200).json({ message: 'Estado del pedido actualizado correctamente.', data: order });
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    return res.status(500).json({ message: 'Error interno del servidor.' });
+  }
+};
