@@ -11,6 +11,7 @@ const orderController = require('../controllers/orderController');
 const productController = require('../controllers/productController');
 const userController = require('../controllers/userController');
 const genericCrudController = require('../controllers/genericCrudController');
+const dispatchController = require('../controllers/dispatchController');
 
 const {
   Category,
@@ -22,7 +23,8 @@ const {
   VehicleYear,
   VehicleDisplacement,
   User,
-  UserAddress
+  UserAddress,
+  Carrier
 } = require('../models');
 
 // Configure Multer for product image uploads
@@ -116,6 +118,8 @@ registerResource('vehicle-models', genericCrudController(VehicleModel, ['name'],
 registerResource('taxes', genericCrudController(Tax, ['name'], [], false));
 registerResource('vehicle-years', genericCrudController(VehicleYear, ['year'], [], false));
 registerResource('vehicle-displacements', genericCrudController(VehicleDisplacement, ['name'], [], false));
+registerResource('carriers', genericCrudController(Carrier, ['name'], [], false));
+registerResource('dispatches', dispatchController);
 
 registerResource('users', userController);
 registerResource('clients', userController); // Alias

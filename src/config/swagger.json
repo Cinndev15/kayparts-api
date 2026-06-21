@@ -418,6 +418,156 @@
         "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
         "responses": { "200": { "description": "Deleted" } }
       }
+    },
+    "/carriers": {
+      "get": {
+        "tags": ["Admin Carriers"],
+        "summary": "List carriers (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "tags": ["Admin Carriers"],
+        "summary": "Create carrier (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string", "example": "Servientrega" },
+                  "phone": { "type": "string", "example": "1234567" },
+                  "email": { "type": "string", "format": "email", "example": "info@servientrega.com" },
+                  "status": { "type": "string", "enum": ["active", "inactive"], "example": "active" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/carriers/{id}": {
+      "get": {
+        "tags": ["Admin Carriers"],
+        "summary": "Get carrier details (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "put": {
+        "tags": ["Admin Carriers"],
+        "summary": "Update carrier (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "Servientrega" },
+                  "phone": { "type": "string", "example": "1234567" },
+                  "email": { "type": "string", "format": "email", "example": "info@servientrega.com" },
+                  "status": { "type": "string", "enum": ["active", "inactive"], "example": "active" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Updated" } }
+      },
+      "delete": {
+        "tags": ["Admin Carriers"],
+        "summary": "Delete carrier (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Deleted" } }
+      }
+    },
+    "/dispatches": {
+      "get": {
+        "tags": ["Admin Dispatches"],
+        "summary": "List dispatches (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["pending", "shipped", "delivered", "returned"] } }
+        ],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "tags": ["Admin Dispatches"],
+        "summary": "Create dispatch (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["order_id", "carrier_id", "tracking_number", "responsible_person"],
+                "properties": {
+                  "order_id": { "type": "integer", "example": 1 },
+                  "carrier_id": { "type": "integer", "example": 1 },
+                  "tracking_number": { "type": "string", "example": "ENV123456789" },
+                  "responsible_person": { "type": "string", "example": "Carlos Perez" },
+                  "status": { "type": "string", "enum": ["pending", "shipped", "delivered", "returned"], "example": "pending" },
+                  "dispatch_date": { "type": "string", "format": "date-time", "example": "2026-06-21T15:00:00Z" },
+                  "notes": { "type": "string", "example": "Delivered to reception." }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/dispatches/{id}": {
+      "get": {
+        "tags": ["Admin Dispatches"],
+        "summary": "Get dispatch details (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "put": {
+        "tags": ["Admin Dispatches"],
+        "summary": "Update dispatch (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order_id": { "type": "integer" },
+                  "carrier_id": { "type": "integer" },
+                  "tracking_number": { "type": "string" },
+                  "responsible_person": { "type": "string" },
+                  "status": { "type": "string", "enum": ["pending", "shipped", "delivered", "returned"] },
+                  "dispatch_date": { "type": "string", "format": "date-time" },
+                  "notes": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Updated" } }
+      },
+      "delete": {
+        "tags": ["Admin Dispatches"],
+        "summary": "Delete dispatch (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Deleted" } }
+      }
     }
   }
 }

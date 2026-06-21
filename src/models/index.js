@@ -17,6 +17,8 @@ const WorkshopApplication = require('./WorkshopApplication');
 const Tax = require('./Tax');
 const Order = require('./Order');
 const OrderItem = require('./OrderItem');
+const Carrier = require('./Carrier');
+const Dispatch = require('./Dispatch');
 
 // User and Token
 User.hasMany(PersonalAccessToken, { foreignKey: 'tokenable_id', constraints: false, scope: { tokenable_type: 'App\\Models\\User' } });
@@ -37,6 +39,14 @@ OrderItem.belongsTo(Order, { foreignKey: 'order_id', as: 'order' });
 // OrderItem and Product
 Product.hasMany(OrderItem, { foreignKey: 'product_id' });
 OrderItem.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
+
+// Order and Dispatch
+Order.hasOne(Dispatch, { foreignKey: 'order_id', as: 'dispatch' });
+Dispatch.belongsTo(Order, { foreignKey: 'order_id', as: 'order' });
+
+// Carrier and Dispatch
+Carrier.hasMany(Dispatch, { foreignKey: 'carrier_id', as: 'dispatches' });
+Dispatch.belongsTo(Carrier, { foreignKey: 'carrier_id', as: 'carrier' });
 
 // Category and Subcategory
 Category.hasMany(Subcategory, { foreignKey: 'category_id', as: 'subcategories' });
@@ -251,4 +261,6 @@ module.exports = {
   Tax,
   Order,
   OrderItem,
+  Carrier,
+  Dispatch,
 };
