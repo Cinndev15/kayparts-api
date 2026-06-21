@@ -22,7 +22,6 @@ async function testWebhook() {
   console.log("Payload:", payloadString);
   console.log("Signature:", signature);
 
-  const fetch = (await import('node-fetch')).default;
   const res = await fetch('http://localhost:8000/api/webhooks/bold', {
     method: 'POST',
     headers: {

@@ -124,8 +124,6 @@ exports.process = async (req, res) => {
            boldPayload.amount.taxes = boldTaxes;
         }
 
-        const fetch = (await import('node-fetch')).default;
-
         const boldRes = await fetch('https://integrations.api.bold.co/online/link/v1', {
           method: 'POST',
           headers: {
