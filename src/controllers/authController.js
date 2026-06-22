@@ -150,7 +150,7 @@ exports.handleProviderCallback = async (req, res) => {
     const { provider } = req.params;
     const { token } = req.body;
 
-    if (!['google', 'apple'].includes(provider)) {
+    if (!['google', 'facebook'].includes(provider)) {
       return res.status(400).json({ error: 'Proveedor no soportado' });
     }
 
@@ -187,15 +187,18 @@ exports.handleProviderCallback = async (req, res) => {
       } catch (err) {
         return res.status(401).json({ error: 'Token inválido o expirado', details: err.message });
       }
-    } else if (provider === 'apple') {
-      // Decode JWT payload for Apple
+    } else if (provider === 'facebook') {
       try {
-        const parts = token.split('.');
-        if (parts.length < 2) throw new Error('JWT malformed');
-        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
-        socialId = payload.sub;
-        email = payload.email;
-        name = req.body.name || 'Usuario Apple';
+        const fbRes = await fetch(`https://graph.facebook.com/me?access_token=${token}&fields=id,name,email`);
+        const fbData = await fbRes.json();
+        
+        if (fbData.error) {
+          throw new Error(fbData.error.message);
+        }
+        
+        socialId = fbData.id;
+        email = fbData.email || null; // Email can be missing if user denied
+        name = fbData.name || 'Usuario Facebook';
       } catch (err) {
         return res.status(401).json({ error: 'Token inválido o expirado', details: err.message });
       }
