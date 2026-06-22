@@ -68,8 +68,18 @@ exports.store = async (req, res) => {
   try {
     const { order_id, carrier_id, tracking_number, responsible_person, status, dispatch_date, notes } = req.body;
 
-    if (!order_id || !carrier_id || !tracking_number || !responsible_person) {
-      return res.status(422).json({ message: 'Los campos order_id, carrier_id, tracking_number y responsible_person son obligatorios.' });
+    if (!order_id || !responsible_person) {
+      return res.status(422).json({ message: 'Los campos order_id y responsible_person son obligatorios.' });
+    }
+
+    const currentStatus = status || 'recibido';
+
+    // Validate that carrier_id and tracking_number are present if status requires shipment
+    const requiresCarrier = ['despachado', 'en_transito', 'entregado'].includes(currentStatus);
+    if (requiresCarrier) {
+      if (!carrier_id || !tracking_number) {
+        return res.status(422).json({ message: `Los campos carrier_id y tracking_number son obligatorios cuando el estado es ${currentStatus}.` });
+      }
     }
 
     // Verify order exists
@@ -78,18 +88,18 @@ exports.store = async (req, res) => {
       return res.status(404).json({ message: 'La orden especificada no existe.' });
     }
 
-    // Verify carrier exists
-    const carrier = await Carrier.findByPk(carrier_id);
-    if (!carrier) {
-      return res.status(404).json({ message: 'La transportadora especificada no existe.' });
+    // Verify carrier exists if provided
+    if (carrier_id) {
+      const carrier = await Carrier.findByPk(carrier_id);
+      if (!carrier) {
+        return res.status(404).json({ message: 'La transportadora especificada no existe.' });
+      }
     }
-
-    const currentStatus = status || 'recibido';
 
     const dispatch = await Dispatch.create({
       order_id,
-      carrier_id,
-      tracking_number,
+      carrier_id: carrier_id || null,
+      tracking_number: tracking_number || null,
       responsible_person,
       status: currentStatus,
       dispatch_date: dispatch_date || new Date(),
@@ -119,6 +129,18 @@ exports.update = async (req, res) => {
 
     const { order_id, carrier_id, tracking_number, responsible_person, status, dispatch_date, notes } = req.body;
 
+    const newStatus = status || dispatch.status;
+
+    // Validate that carrier_id and tracking_number are present if new status requires shipment
+    const requiresCarrier = ['despachado', 'en_transito', 'entregado'].includes(newStatus);
+    if (requiresCarrier) {
+      const targetCarrier = carrier_id || dispatch.carrier_id;
+      const targetTracking = tracking_number || dispatch.tracking_number;
+      if (!targetCarrier || !targetTracking) {
+        return res.status(422).json({ message: `Los campos carrier_id y tracking_number son obligatorios cuando el estado es ${newStatus}.` });
+      }
+    }
+
     if (order_id) {
       const order = await Order.findByPk(order_id);
       if (!order) {
@@ -137,10 +159,10 @@ exports.update = async (req, res) => {
 
     await dispatch.update({
       order_id: order_id || dispatch.order_id,
-      carrier_id: carrier_id || dispatch.carrier_id,
-      tracking_number: tracking_number || dispatch.tracking_number,
+      carrier_id: carrier_id !== undefined ? carrier_id : dispatch.carrier_id,
+      tracking_number: tracking_number !== undefined ? tracking_number : dispatch.tracking_number,
       responsible_person: responsible_person || dispatch.responsible_person,
-      status: status || dispatch.status,
+      status: newStatus,
       dispatch_date: dispatch_date || dispatch.dispatch_date,
       notes: notes !== undefined ? notes : dispatch.notes
     });
@@ -151,7 +173,7 @@ exports.update = async (req, res) => {
         dispatch_id: dispatch.id,
         status,
         description: `El estado del despacho ha sido cambiado a: ${status}.`,
-        location: 'Tránsito'
+        location: ['recibido', 'alistamiento'].includes(status) ? 'Bodega Principal' : 'Tránsito'
       });
     }
 

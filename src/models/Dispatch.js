@@ -13,11 +13,11 @@ const Dispatch = sequelize.define('Dispatch', {
   },
   carrier_id: {
     type: DataTypes.BIGINT.UNSIGNED,
-    allowNull: false,
+    allowNull: true,
   },
   tracking_number: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   responsible_person: {
     type: DataTypes.STRING,
