@@ -350,44 +350,39 @@ exports.index = async (req, res) => {
       order = [['created_at', 'DESC']];
     }
 
-    // Vehicle Search Filters (Make, Model, Year, Displacement)
-    // In Sequelize, if we filter on many-to-many associations, we can add `where` on the includes.
-    if (vehicle_make || vehicle_model || year) {
-      const vmInclude = includes.find(i => i.as === 'vehicleModels');
-      vmInclude.required = true; // Make it an INNER JOIN
-      const vmWhere = {};
-
+    // Vehicle Search Filters using subqueries to avoid Sequelize pagination JOIN bugs
+    if (vehicle_make || vehicle_model) {
+      let subQuery = 'SELECT product_id FROM product_vehicle_model pvm JOIN vehicle_models vm ON pvm.vehicle_model_id = vm.id WHERE 1=1';
       if (vehicle_make) {
-        vmInclude.include = [{
-          model: Brand,
-          as: 'brand',
-          required: true,
-          where: isNaN(vehicle_make) ? { name: { [Op.like]: `%${vehicle_make}%` } } : { id: vehicle_make }
-        }];
-      }
-
-      if (vehicle_model) {
-        if (isNaN(vehicle_model)) {
-          vmWhere.name = { [Op.like]: `%${vehicle_model}%` };
+        if (isNaN(vehicle_make)) {
+          subQuery += ` AND vm.brand_id IN (SELECT id FROM brands WHERE name LIKE '%${vehicle_make}%')`;
         } else {
-          vmWhere.id = vehicle_model;
+          subQuery += ` AND vm.brand_id = ${parseInt(vehicle_make)}`;
         }
       }
-
-      // Year filter (range in pivot table `product_vehicle_model`)
-      // Sequelize matches year_from and year_to from the pivot join columns
-      if (year) {
-        vmWhere['$product_vehicle_model.year_from$'] = { [Op.lte]: parseInt(year) };
-        vmWhere['$product_vehicle_model.year_to$'] = { [Op.gte]: parseInt(year) };
+      if (vehicle_model) {
+        if (isNaN(vehicle_model)) {
+          subQuery += ` AND vm.name LIKE '%${vehicle_model}%'`;
+        } else {
+          subQuery += ` AND vm.id = ${parseInt(vehicle_model)}`;
+        }
       }
+      where.id = { ...(where.id || {}), [Op.in]: sequelize.literal(`(${subQuery})`) };
+    }
 
-      vmInclude.where = vmWhere;
+    if (year) {
+      where.id = { 
+        ...(where.id || {}), 
+        [Op.in]: sequelize.literal(`(SELECT product_id FROM product_vehicle_year WHERE vehicle_year_id IN (SELECT id FROM vehicle_years WHERE year = ${parseInt(year)}))`) 
+      };
     }
 
     if (displacement) {
-      const dispInclude = includes.find(i => i.as === 'vehicleDisplacements');
-      dispInclude.required = true;
-      dispInclude.where = isNaN(displacement) ? { name: { [Op.like]: `%${displacement}%` } } : { id: displacement };
+      const dispCondition = isNaN(displacement) ? `name LIKE '%${displacement}%'` : `id = ${parseInt(displacement)}`;
+      where.id = { 
+        ...(where.id || {}), 
+        [Op.in]: sequelize.literal(`(SELECT product_id FROM product_vehicle_displacement WHERE vehicle_displacement_id IN (SELECT id FROM vehicle_displacements WHERE ${dispCondition}))`) 
+      };
     }
 
     const { rows: products, count } = await Product.findAndCountAll({
