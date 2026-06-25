@@ -351,6 +351,8 @@ exports.index = async (req, res) => {
     }
 
     // Vehicle Search Filters using subqueries to avoid Sequelize pagination JOIN bugs
+    const idConditions = [];
+
     if (vehicle_make || vehicle_model) {
       let subQuery = 'SELECT product_id FROM product_vehicle_model pvm JOIN vehicle_models vm ON pvm.vehicle_model_id = vm.id WHERE 1=1';
       if (vehicle_make) {
@@ -367,22 +369,24 @@ exports.index = async (req, res) => {
           subQuery += ` AND vm.id = ${parseInt(vehicle_model)}`;
         }
       }
-      where.id = { ...(where.id || {}), [Op.in]: sequelize.literal(`(${subQuery})`) };
+      idConditions.push({ [Op.in]: sequelize.literal(`(${subQuery})`) });
     }
 
     if (year) {
-      where.id = { 
-        ...(where.id || {}), 
-        [Op.in]: sequelize.literal(`(SELECT product_id FROM product_vehicle_year WHERE vehicle_year_id IN (SELECT id FROM vehicle_years WHERE year = ${parseInt(year)}))`) 
-      };
+      idConditions.push({
+        [Op.in]: sequelize.literal(`(SELECT product_id FROM product_vehicle_year WHERE vehicle_year_id IN (SELECT id FROM vehicle_years WHERE year = ${parseInt(year)}))`)
+      });
     }
 
     if (displacement) {
       const dispCondition = isNaN(displacement) ? `name LIKE '%${displacement}%'` : `id = ${parseInt(displacement)}`;
-      where.id = { 
-        ...(where.id || {}), 
-        [Op.in]: sequelize.literal(`(SELECT product_id FROM product_vehicle_displacement WHERE vehicle_displacement_id IN (SELECT id FROM vehicle_displacements WHERE ${dispCondition}))`) 
-      };
+      idConditions.push({
+        [Op.in]: sequelize.literal(`(SELECT product_id FROM product_vehicle_displacement WHERE vehicle_displacement_id IN (SELECT id FROM vehicle_displacements WHERE ${dispCondition}))`)
+      });
+    }
+
+    if (idConditions.length > 0) {
+      where.id = { [Op.and]: idConditions };
     }
 
     const { rows: products, count } = await Product.findAndCountAll({
