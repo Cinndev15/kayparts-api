@@ -168,7 +168,7 @@ exports.categories = async (req, res) => {
       include: [{
         model: Product,
         as: 'products',
-        required: true,
+        required: false,
         where: { status: 'active' }
       }],
       order: [['name', 'ASC']],
