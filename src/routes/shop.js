@@ -6,6 +6,7 @@ router.get('/products', shopController.index);
 router.get('/filters', shopController.filters);
 router.get('/products/:slug', shopController.show);
 router.get('/vehicle-models/:makeId', shopController.vehicleModelsByMake);
+router.get('/track-order', shopController.trackOrder);
 
 // Individual filter endpoints
 router.get('/makes', shopController.makes);

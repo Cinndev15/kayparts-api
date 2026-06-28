@@ -12,7 +12,12 @@ const {
   ProductImage,
   ProductCriterion,
   ProductAlternateReference,
-  Tax
+  Tax,
+  Order,
+  Dispatch,
+  DispatchTracking,
+  Carrier,
+  OrderItem
 } = require('../models');
 
 // Helper to format Product JSON exactly like ProductResource in Laravel
@@ -459,6 +464,104 @@ exports.vehicleModelsByMake = async (req, res) => {
       order: [['name', 'ASC']],
     });
     return res.json(models);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+exports.trackOrder = async (req, res) => {
+  try {
+    const { query } = req.query;
+    if (!query) {
+      return res.status(400).json({ error: 'Debes proporcionar un número de pedido o guía.' });
+    }
+
+    let order = await Order.findOne({
+      where: { order_number: query },
+      include: [
+        {
+          model: Dispatch,
+          as: 'dispatch',
+          include: [
+            { model: Carrier, as: 'carrier' },
+            { model: DispatchTracking, as: 'trackingHistory' }
+          ]
+        },
+        {
+          model: OrderItem,
+          as: 'items',
+          include: [{ model: Product, as: 'product', include: [{ model: ProductImage, as: 'principalImage', scope: { is_primary: true } }] }]
+        }
+      ]
+    });
+
+    if (!order) {
+      const dispatch = await Dispatch.findOne({
+        where: { tracking_number: query },
+        include: [
+          { model: Carrier, as: 'carrier' },
+          { model: DispatchTracking, as: 'trackingHistory' },
+          {
+            model: Order,
+            as: 'order',
+            include: [
+              {
+                model: OrderItem,
+                as: 'items',
+                include: [{ model: Product, as: 'product', include: [{ model: ProductImage, as: 'principalImage', scope: { is_primary: true } }] }]
+              }
+            ]
+          }
+        ]
+      });
+
+      if (dispatch && dispatch.order) {
+        order = dispatch.order;
+        order.dataValues.dispatch = dispatch;
+      }
+    }
+
+    if (!order) {
+      return res.status(404).json({ error: 'No se encontró ningún pedido o guía con ese número.' });
+    }
+
+    const response = {
+      order_number: order.order_number,
+      status: order.status,
+      date: order.createdAt || order.created_at || order.getDataValue('createdAt'),
+      total: order.total_amount,
+      customer: order.customer_name,
+      items: (order.items || []).map(item => {
+        let imageUrl = null;
+        if (item.product && item.product.principalImage) {
+            imageUrl = item.product.principalImage.toJSON ? item.product.principalImage.toJSON().image_url : item.product.principalImage.image_url;
+        }
+        return {
+          id: item.id,
+          name: item.product_name || (item.product ? item.product.name : 'Producto'),
+          quantity: item.quantity,
+          price: item.price,
+          image: imageUrl
+        };
+      }),
+      dispatch: null
+    };
+
+    if (order.dataValues.dispatch || order.dispatch) {
+      const d = order.dataValues.dispatch || order.dispatch;
+      response.dispatch = {
+        status: d.status,
+        tracking_number: d.tracking_number,
+        carrier: d.carrier ? d.carrier.name : null,
+        history: d.trackingHistory ? d.trackingHistory.map(h => ({
+          status: h.status,
+          date: h.createdAt || h.created_at || h.getDataValue('createdAt'),
+          notes: h.notes
+        })).sort((a, b) => new Date(b.date) - new Date(a.date)) : []
+      };
+    }
+
+    return res.json(response);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
