@@ -36,13 +36,14 @@ exports.process = async (req, res) => {
           throw new Error(`No hay suficiente stock para el producto: ${product.name}`);
         }
 
-        const unitPrice = parseFloat(product.price);
+        const grossUnitPrice = parseFloat(product.price);
         const quantity = parseInt(item.quantity);
 
-        // Calculate Taxes
+        // Calculate Taxes (assuming product.price has VAT/IVA included)
         const itemTaxRate = (product.taxes || []).reduce((sum, tax) => sum + parseFloat(tax.rate), 0);
-        const itemTaxAmount = (unitPrice * (itemTaxRate / 100)) * quantity;
-        const itemSubtotal = (unitPrice * quantity) + itemTaxAmount;
+        const baseUnitPrice = grossUnitPrice / (1 + (itemTaxRate / 100));
+        const itemSubtotal = grossUnitPrice * quantity;
+        const itemTaxAmount = itemSubtotal - (baseUnitPrice * quantity);
 
         totalAmount += itemSubtotal;
         taxAmount += itemTaxAmount;
@@ -51,9 +52,9 @@ exports.process = async (req, res) => {
           product_id: product.id,
           product_name: product.name,
           quantity: quantity,
-          unit_price: unitPrice,
+          unit_price: baseUnitPrice, // Base price excluding VAT
           tax_rate: itemTaxRate,
-          subtotal: itemSubtotal,
+          subtotal: itemSubtotal, // Total price including VAT
         });
       }
 
