@@ -25,7 +25,8 @@ const {
   VehicleDisplacement,
   User,
   UserAddress,
-  Carrier
+  Carrier,
+  Article
 } = require('../models');
 
 // Configure Multer for product image uploads
@@ -123,6 +124,7 @@ registerResource('vehicle-years', genericCrudController(VehicleYear, ['year'], [
 registerResource('vehicle-displacements', genericCrudController(VehicleDisplacement, ['name'], [], false));
 registerResource('carriers', genericCrudController(Carrier, ['name'], [], false));
 registerResource('dispatches', dispatchController);
+registerResource('articles', genericCrudController(Article, ['title', 'category'], [], true, 'articles'), createUploadMiddleware('articles'));
 
 // Dispatch Tracking routes
 router.get('/dispatches/:dispatchId/tracking', dispatchTrackingController.index);

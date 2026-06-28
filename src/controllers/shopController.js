@@ -17,7 +17,8 @@ const {
   Dispatch,
   DispatchTracking,
   Carrier,
-  OrderItem
+  OrderItem,
+  Article
 } = require('../models');
 
 // Helper to format Product JSON exactly like ProductResource in Laravel
@@ -562,6 +563,59 @@ exports.trackOrder = async (req, res) => {
     }
 
     return res.json(response);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+exports.articles = async (req, res) => {
+  try {
+    const { category, search, page = 1, per_page = 10 } = req.query;
+    const limit = parseInt(per_page);
+    const offset = (parseInt(page) - 1) * limit;
+
+    const where = {};
+    if (category && category !== 'Todos') {
+      where.category = category;
+    }
+
+    if (search) {
+      where[Op.or] = [
+        { title: { [Op.like]: `%${search}%` } },
+        { excerpt: { [Op.like]: `%${search}%` } },
+        { content: { [Op.like]: `%${search}%` } }
+      ];
+    }
+
+    const { rows, count } = await Article.findAndCountAll({
+      where,
+      limit,
+      offset,
+      order: [['id', 'DESC']]
+    });
+
+    return res.json({
+      data: rows,
+      meta: {
+        current_page: parseInt(page),
+        per_page: limit,
+        total: count,
+        last_page: Math.ceil(count / limit)
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+exports.articleBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const article = await Article.findOne({ where: { slug } });
+    if (!article) {
+      return res.status(404).json({ message: 'Artículo no encontrado.' });
+    }
+    return res.json({ data: article });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

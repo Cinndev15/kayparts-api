@@ -20,6 +20,7 @@ const OrderItem = require('./OrderItem');
 const Carrier = require('./Carrier');
 const Dispatch = require('./Dispatch');
 const DispatchTracking = require('./DispatchTracking');
+const Article = require('./Article');
 
 // User and Token
 User.hasMany(PersonalAccessToken, { foreignKey: 'tokenable_id', constraints: false, scope: { tokenable_type: 'App\\Models\\User' } });
@@ -204,6 +205,12 @@ VehicleModel.prototype.toJSON = function () {
   return values;
 };
 
+Article.prototype.toJSON = function () {
+  const values = Object.assign({}, this.get());
+  values.image_url = getImageUrl(values.image_path);
+  return values;
+};
+
 Product.prototype.toJSON = function () {
   const values = Object.assign({}, this.get());
 
@@ -269,4 +276,5 @@ module.exports = {
   Carrier,
   Dispatch,
   DispatchTracking,
+  Article,
 };

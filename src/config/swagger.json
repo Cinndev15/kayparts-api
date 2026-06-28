@@ -600,6 +600,115 @@
         },
         "responses": { "201": { "description": "Created" } }
       }
+    },
+    "/articles": {
+      "get": {
+        "tags": ["Admin Articles"],
+        "summary": "List articles (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "per_page", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "tags": ["Admin Articles"],
+        "summary": "Create article (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "category"],
+                "properties": {
+                  "title": { "type": "string", "example": "Cómo cambiar bujías" },
+                  "category": { "type": "string", "example": "Motor" },
+                  "excerpt": { "type": "string", "example": "Guía práctica paso a paso..." },
+                  "content": { "type": "string", "example": "<p>Detalle de la guía...</p>" },
+                  "image": { "type": "string", "format": "binary" },
+                  "read_time": { "type": "string", "example": "5 min" },
+                  "author": { "type": "string", "example": "KayParts Tech" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/articles/{id}": {
+      "get": {
+        "tags": ["Admin Articles"],
+        "summary": "Get article details (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "put": {
+        "tags": ["Admin Articles"],
+        "summary": "Update article (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "category": { "type": "string" },
+                  "excerpt": { "type": "string" },
+                  "content": { "type": "string" },
+                  "image": { "type": "string", "format": "binary" },
+                  "read_time": { "type": "string" },
+                  "author": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Updated" } }
+      },
+      "delete": {
+        "tags": ["Admin Articles"],
+        "summary": "Delete article (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Deleted" } }
+      }
+    },
+    "/shop/articles": {
+      "get": {
+        "tags": ["Shop Articles"],
+        "summary": "List public articles with category filters and pagination",
+        "parameters": [
+          { "name": "category", "in": "query", "schema": { "type": "string" } },
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "per_page", "in": "query", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/shop/articles/{slug}": {
+      "get": {
+        "tags": ["Shop Articles"],
+        "summary": "Get a public article details by slug",
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Success" },
+          "404": { "description": "Article not found" }
+        }
+      }
     }
   }
 }

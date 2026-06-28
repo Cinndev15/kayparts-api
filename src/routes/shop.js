@@ -15,4 +15,8 @@ router.get('/years', shopController.years);
 router.get('/displacements', shopController.displacements);
 router.get('/categories', shopController.categories);
 
+// Articles public endpoints
+router.get('/articles', shopController.articles);
+router.get('/articles/:slug', shopController.articleBySlug);
+
 module.exports = router;
