@@ -7,11 +7,38 @@ const checkoutController = require('../controllers/checkoutController');
 const boldWebhookController = require('../controllers/boldWebhookController');
 const workshopApplicationController = require('../controllers/workshopApplicationController');
 
+const { Article } = require('../models');
 const optionalAuthMiddleware = require('../middleware/optionalAuth');
 
 router.post('/checkout/process', optionalAuthMiddleware, checkoutController.process);
 router.post('/webhooks/bold', boldWebhookController.handle);
 router.post('/workshop-applications', workshopApplicationController.store);
+
+// Public Articles / News endpoints
+router.get('/articles', async (req, res) => {
+  try {
+    const articles = await Article.findAll({
+      order: [['created_at', 'DESC']]
+    });
+    return res.json({ data: articles });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/articles/:slug', async (req, res) => {
+  try {
+    const article = await Article.findOne({
+      where: { slug: req.params.slug }
+    });
+    if (!article) {
+      return res.status(404).json({ message: 'Artículo no encontrado' });
+    }
+    return res.json({ data: article });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
 
 // Resiliency endpoints mirroring original Laravel helper routes
 router.get('/setup-folders', (req, res) => {
