@@ -26,7 +26,8 @@ const {
   User,
   UserAddress,
   Carrier,
-  Article
+  Article,
+  WorkshopApplication
 } = require('../models');
 
 // Configure Multer for product image uploads
@@ -125,6 +126,7 @@ registerResource('vehicle-displacements', genericCrudController(VehicleDisplacem
 registerResource('carriers', genericCrudController(Carrier, ['name'], [], false));
 registerResource('dispatches', dispatchController);
 registerResource('articles', genericCrudController(Article, ['title', 'category'], [], true, 'articles'), createUploadMiddleware('articles'));
+registerResource('workshop-applications', genericCrudController(WorkshopApplication, ['workshop_name', 'owner_name', 'email'], [], false));
 
 // Dispatch Tracking routes
 router.get('/dispatches/:dispatchId/tracking', dispatchTrackingController.index);
