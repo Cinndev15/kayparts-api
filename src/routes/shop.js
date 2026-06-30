@@ -19,4 +19,8 @@ router.get('/categories', shopController.categories);
 router.get('/articles', shopController.articles);
 router.get('/articles/:slug', shopController.articleBySlug);
 
+// Add contact here in case frontend hits /shop/contact
+const contactController = require('../controllers/contactController');
+router.post('/contact', contactController.send);
+
 module.exports = router;
