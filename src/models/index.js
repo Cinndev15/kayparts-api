@@ -21,6 +21,7 @@ const Carrier = require('./Carrier');
 const Dispatch = require('./Dispatch');
 const DispatchTracking = require('./DispatchTracking');
 const Article = require('./Article');
+const Supplier = require('./Supplier');
 
 // User and Token
 User.hasMany(PersonalAccessToken, { foreignKey: 'tokenable_id', constraints: false, scope: { tokenable_type: 'App\\Models\\User' } });
@@ -158,7 +159,7 @@ Product.belongsToMany(Product, {
 });
 
 // Creator and Updater relations
-const auditedModels = [Product, Category, Subcategory, ProductBrand, Brand, VehicleModel, VehicleYear, VehicleDisplacement, Carrier, Article, WorkshopApplication, Tax, Dispatch];
+const auditedModels = [Product, Category, Subcategory, ProductBrand, Brand, VehicleModel, VehicleYear, VehicleDisplacement, Carrier, Article, WorkshopApplication, Tax, Dispatch, Supplier];
 auditedModels.forEach(model => {
   model.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
   model.belongsTo(User, { foreignKey: 'updated_by', as: 'updater' });
@@ -284,4 +285,5 @@ module.exports = {
   Dispatch,
   DispatchTracking,
   Article,
+  Supplier,
 };

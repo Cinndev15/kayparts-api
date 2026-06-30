@@ -709,6 +709,93 @@
           "404": { "description": "Article not found" }
         }
       }
+    },
+    "/suppliers": {
+      "get": {
+        "tags": ["Admin Suppliers"],
+        "summary": "List suppliers (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "per_page", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "tags": ["Admin Suppliers"],
+        "summary": "Create supplier (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["nit_or_cedula", "razon_social"],
+                "properties": {
+                  "nit_or_cedula": { "type": "string", "example": "800.192.831-2" },
+                  "razon_social": { "type": "string", "example": "Distribuidora Repuestos SAS" },
+                  "assigned_advisor": { "type": "string", "example": "Carlos Mendez" },
+                  "phone": { "type": "string", "example": "+57 312 4567890" },
+                  "whatsapp": { "type": "string", "example": "+57 312 4567890" },
+                  "department": { "type": "string", "example": "Cundinamarca" },
+                  "city": { "type": "string", "example": "Bogotá" },
+                  "address": { "type": "string", "example": "Calle 100 #15-30" },
+                  "email": { "type": "string", "format": "email", "example": "ventas@repuestossas.com" },
+                  "status": { "type": "string", "enum": ["active", "inactive"], "example": "active" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/suppliers/{id}": {
+      "get": {
+        "tags": ["Admin Suppliers"],
+        "summary": "Get supplier details (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "put": {
+        "tags": ["Admin Suppliers"],
+        "summary": "Update supplier (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nit_or_cedula": { "type": "string" },
+                  "razon_social": { "type": "string" },
+                  "assigned_advisor": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "whatsapp": { "type": "string" },
+                  "department": { "type": "string" },
+                  "city": { "type": "string" },
+                  "address": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "status": { "type": "string", "enum": ["active", "inactive"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Updated" } }
+      },
+      "delete": {
+        "tags": ["Admin Suppliers"],
+        "summary": "Delete supplier (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Deleted" } }
+      }
     }
   }
 }
