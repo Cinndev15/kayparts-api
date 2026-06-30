@@ -7,6 +7,11 @@ const Supplier = sequelize.define('Supplier', {
     primaryKey: true,
     autoIncrement: true,
   },
+  identification_type: {
+    type: DataTypes.ENUM('NIT', 'Cédula'),
+    defaultValue: 'NIT',
+    allowNull: false,
+  },
   nit_or_cedula: {
     type: DataTypes.STRING,
     allowNull: false,
