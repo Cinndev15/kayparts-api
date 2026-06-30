@@ -6,6 +6,7 @@ const path = require('path');
 const checkoutController = require('../controllers/checkoutController');
 const boldWebhookController = require('../controllers/boldWebhookController');
 const workshopApplicationController = require('../controllers/workshopApplicationController');
+const contactController = require('../controllers/contactController');
 
 const { Article } = require('../models');
 const optionalAuthMiddleware = require('../middleware/optionalAuth');
@@ -13,6 +14,7 @@ const optionalAuthMiddleware = require('../middleware/optionalAuth');
 router.post('/checkout/process', optionalAuthMiddleware, checkoutController.process);
 router.post('/webhooks/bold', boldWebhookController.handle);
 router.post('/workshop-applications', workshopApplicationController.store);
+router.post('/contact', contactController.send);
 
 // Public Articles / News endpoints
 router.get('/articles', async (req, res) => {
