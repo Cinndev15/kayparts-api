@@ -78,6 +78,14 @@ const Product = sequelize.define('Product', {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  created_by: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true,
+  },
+  updated_by: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true,
+  },
 }, {
   tableName: 'products',
   paranoid: true, // Enables SoftDeletes

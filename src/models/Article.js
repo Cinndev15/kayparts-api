@@ -40,6 +40,14 @@ const Article = sequelize.define('Article', {
     type: DataTypes.STRING,
     defaultValue: 'KayParts Tech',
   },
+  created_by: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true,
+  },
+  updated_by: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true,
+  },
 }, {
   tableName: 'articles',
   timestamps: true,

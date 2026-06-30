@@ -61,6 +61,9 @@ module.exports = (Model, searchFields = [], defaultIncludes = [], hasSlug = fals
         if (req.file && uploadSubfolder) {
           data.image_path = `${uploadSubfolder}/${req.file.filename}`;
         }
+        if (req.user) {
+          data.created_by = req.user.id;
+        }
         const item = await Model.create(data);
         return res.status(201).json({ data: item });
       } catch (error) {
@@ -87,6 +90,9 @@ module.exports = (Model, searchFields = [], defaultIncludes = [], hasSlug = fals
             }
           }
           data.image_path = `${uploadSubfolder}/${req.file.filename}`;
+        }
+        if (req.user) {
+          data.updated_by = req.user.id;
         }
         await item.update(data);
         return res.json({ data: item });

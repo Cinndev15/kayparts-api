@@ -19,6 +19,14 @@ const Tax = sequelize.define('Tax', {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
   },
+  created_by: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true,
+  },
+  updated_by: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true,
+  },
 }, {
   tableName: 'taxes',
 });

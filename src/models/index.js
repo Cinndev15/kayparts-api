@@ -157,6 +157,13 @@ Product.belongsToMany(Product, {
   as: 'compatibleProducts'
 });
 
+// Creator and Updater relations
+const auditedModels = [Product, Category, Subcategory, ProductBrand, Brand, VehicleModel, VehicleYear, VehicleDisplacement, Carrier, Article, WorkshopApplication, Tax, Dispatch];
+auditedModels.forEach(model => {
+  model.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+  model.belongsTo(User, { foreignKey: 'updated_by', as: 'updater' });
+});
+
 // Define Virtual Getters / helper properties for image_url
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null;

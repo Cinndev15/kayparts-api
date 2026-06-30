@@ -103,7 +103,8 @@ exports.store = async (req, res) => {
       responsible_person,
       status: currentStatus,
       dispatch_date: dispatch_date || new Date(),
-      notes
+      notes,
+      created_by: req.user ? req.user.id : null
     });
 
     // Create initial tracking record
@@ -164,7 +165,8 @@ exports.update = async (req, res) => {
       responsible_person: responsible_person || dispatch.responsible_person,
       status: newStatus,
       dispatch_date: dispatch_date || dispatch.dispatch_date,
-      notes: notes !== undefined ? notes : dispatch.notes
+      notes: notes !== undefined ? notes : dispatch.notes,
+      updated_by: req.user ? req.user.id : null
     });
 
     // If status changed, create a new tracking milestone

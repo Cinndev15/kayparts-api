@@ -12,6 +12,14 @@ const VehicleDisplacement = sequelize.define('VehicleDisplacement', {
     allowNull: false,
     unique: true,
   },
+  created_by: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true,
+  },
+  updated_by: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true,
+  },
 }, {
   tableName: 'vehicle_displacements',
 });

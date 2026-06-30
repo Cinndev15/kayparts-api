@@ -23,6 +23,14 @@ const Carrier = sequelize.define('Carrier', {
     type: DataTypes.ENUM('active', 'inactive'),
     defaultValue: 'active',
   },
+  created_by: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true,
+  },
+  updated_by: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true,
+  },
 }, {
   tableName: 'carriers',
   timestamps: true,

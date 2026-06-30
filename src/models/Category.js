@@ -19,6 +19,14 @@ const Category = sequelize.define('Category', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  created_by: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true,
+  },
+  updated_by: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true,
+  },
 }, {
   tableName: 'categories',
 });

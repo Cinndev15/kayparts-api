@@ -77,6 +77,7 @@ exports.store = async (req, res) => {
         sku, name, slug, description, price, stock, brand_id, category_id, subcategory_id,
         status: status || 'active', condition, spare_type, position, side, transmission, reference,
         is_featured: is_featured === 'true' || is_featured === true,
+        created_by: req.user ? req.user.id : null,
       }, { transaction: t });
 
       // Handle Vehicle Models Sync
@@ -250,6 +251,7 @@ exports.update = async (req, res) => {
       if (transmission !== undefined) updateData.transmission = transmission;
       if (reference !== undefined) updateData.reference = reference;
       if (is_featured !== undefined) updateData.is_featured = is_featured === 'true' || is_featured === true;
+      if (req.user) updateData.updated_by = req.user.id;
 
       await product.update(updateData, { transaction: t });
 
