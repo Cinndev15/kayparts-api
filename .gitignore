@@ -3,4 +3,3 @@ node_modules/
 .DS_Store
 public/uploads/products/*
 !public/uploads/products/.gitkeep
-database/data/colombia_geo.json
