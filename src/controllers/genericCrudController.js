@@ -63,6 +63,7 @@ module.exports = (Model, searchFields = [], defaultIncludes = [], hasSlug = fals
         }
         if (req.user) {
           data.created_by = req.user.id;
+          data.updated_by = req.user.id;
         }
         const item = await Model.create(data);
         return res.status(201).json({ data: item });
