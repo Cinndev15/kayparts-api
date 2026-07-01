@@ -13,6 +13,7 @@ const userController = require('../controllers/userController');
 const genericCrudController = require('../controllers/genericCrudController');
 const dispatchController = require('../controllers/dispatchController');
 const dispatchTrackingController = require('../controllers/dispatchTrackingController');
+const invoiceController = require('../controllers/invoiceController');
 
 const {
   Category,
@@ -28,7 +29,8 @@ const {
   Carrier,
   Article,
   WorkshopApplication,
-  Supplier
+  Supplier,
+  InvoicingResolution
 } = require('../models');
 
 // Configure Multer for product image uploads
@@ -129,6 +131,13 @@ registerResource('dispatches', dispatchController);
 registerResource('articles', genericCrudController(Article, ['title', 'category'], [], true, 'articles'), createUploadMiddleware('articles'));
 registerResource('workshop-applications', genericCrudController(WorkshopApplication, ['workshop_name', 'owner_name', 'email'], [], false));
 registerResource('suppliers', genericCrudController(Supplier, ['razon_social', 'nit_or_cedula', 'assigned_advisor'], [], false));
+registerResource('invoicing-resolutions', genericCrudController(InvoicingResolution, ['prefix', 'resolution_number'], [], false));
+
+// Invoice management routes
+router.get('/invoices', invoiceController.index);
+router.get('/invoices/:id', invoiceController.show);
+router.post('/invoices', invoiceController.store);
+router.post('/invoices/:id/cancel', invoiceController.cancel);
 
 // Dispatch Tracking routes
 router.get('/dispatches/:dispatchId/tracking', dispatchTrackingController.index);

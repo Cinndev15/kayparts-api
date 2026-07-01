@@ -22,6 +22,9 @@ const Dispatch = require('./Dispatch');
 const DispatchTracking = require('./DispatchTracking');
 const Article = require('./Article');
 const Supplier = require('./Supplier');
+const InvoicingResolution = require('./InvoicingResolution');
+const Invoice = require('./Invoice');
+const InvoiceItem = require('./InvoiceItem');
 
 // User and Token
 User.hasMany(PersonalAccessToken, { foreignKey: 'tokenable_id', constraints: false, scope: { tokenable_type: 'App\\Models\\User' } });
@@ -38,6 +41,18 @@ Order.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 // Order and OrderItems
 Order.hasMany(OrderItem, { foreignKey: 'order_id', as: 'items' });
 OrderItem.belongsTo(Order, { foreignKey: 'order_id', as: 'order' });
+
+// Order and Invoice
+Order.hasOne(Invoice, { foreignKey: 'order_id', as: 'invoice' });
+Invoice.belongsTo(Order, { foreignKey: 'order_id', as: 'order' });
+
+// Invoice and InvoiceItem
+Invoice.hasMany(InvoiceItem, { foreignKey: 'invoice_id', as: 'items' });
+InvoiceItem.belongsTo(Invoice, { foreignKey: 'invoice_id', as: 'invoice' });
+
+// InvoicingResolution and Invoice
+InvoicingResolution.hasMany(Invoice, { foreignKey: 'resolution_id', as: 'invoices' });
+Invoice.belongsTo(InvoicingResolution, { foreignKey: 'resolution_id', as: 'resolution' });
 
 // OrderItem and Product
 Product.hasMany(OrderItem, { foreignKey: 'product_id' });
@@ -159,7 +174,7 @@ Product.belongsToMany(Product, {
 });
 
 // Creator and Updater relations
-const auditedModels = [Product, Category, Subcategory, ProductBrand, Brand, VehicleModel, VehicleYear, VehicleDisplacement, Carrier, Article, WorkshopApplication, Tax, Dispatch, Supplier];
+const auditedModels = [Product, Category, Subcategory, ProductBrand, Brand, VehicleModel, VehicleYear, VehicleDisplacement, Carrier, Article, WorkshopApplication, Tax, Dispatch, Supplier, InvoicingResolution, Invoice];
 auditedModels.forEach(model => {
   model.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
   model.belongsTo(User, { foreignKey: 'updated_by', as: 'updater' });
@@ -286,4 +301,7 @@ module.exports = {
   DispatchTracking,
   Article,
   Supplier,
+  InvoicingResolution,
+  Invoice,
+  InvoiceItem,
 };

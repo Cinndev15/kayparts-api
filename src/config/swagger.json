@@ -796,6 +796,93 @@
         "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
         "responses": { "200": { "description": "Deleted" } }
       }
+    },
+    "/invoicing-resolutions": {
+      "get": {
+        "tags": ["Admin Invoices"],
+        "summary": "List invoicing resolutions (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "tags": ["Admin Invoices"],
+        "summary": "Create invoicing resolution (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["prefix", "resolution_number", "start_number", "end_number", "current_number", "resolution_date", "expiry_date"],
+                "properties": {
+                  "prefix": { "type": "string", "example": "KAY" },
+                  "resolution_number": { "type": "string", "example": "18764000000123" },
+                  "start_number": { "type": "integer", "example": 1000 },
+                  "end_number": { "type": "integer", "example": 99999 },
+                  "current_number": { "type": "integer", "example": 1000 },
+                  "resolution_date": { "type": "string", "format": "date", "example": "2026-06-30" },
+                  "expiry_date": { "type": "string", "format": "date", "example": "2027-06-30" },
+                  "is_active": { "type": "boolean", "default": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/invoices": {
+      "get": {
+        "tags": ["Admin Invoices"],
+        "summary": "List invoices (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["issued", "cancelled"] } },
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "per_page", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "tags": ["Admin Invoices"],
+        "summary": "Generate invoice from paid order (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["order_id"],
+                "properties": {
+                  "order_id": { "type": "integer", "example": 1 }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/invoices/{id}": {
+      "get": {
+        "tags": ["Admin Invoices"],
+        "summary": "Get invoice details (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/invoices/{id}/cancel": {
+      "post": {
+        "tags": ["Admin Invoices"],
+        "summary": "Cancel/Void invoice (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Cancelled successfully" } }
+      }
     }
   }
 }
