@@ -3,7 +3,7 @@ const { Category, ProductBrand, Brand, VehicleModel, VehicleYear, VehicleDisplac
 exports.categories = async (req, res) => {
   try {
     const list = await Category.findAll({
-      attributes: ['id', 'name'],
+      attributes: ['id', 'name', 'slug', 'image_path'],
       order: [['name', 'ASC']],
     });
     return res.json(list);
