@@ -25,6 +25,9 @@ const Supplier = require('./Supplier');
 const InvoicingResolution = require('./InvoicingResolution');
 const Invoice = require('./Invoice');
 const InvoiceItem = require('./InvoiceItem');
+const PurchaseOrder = require('./PurchaseOrder');
+const PurchaseOrderItem = require('./PurchaseOrderItem');
+const PurchaseOrderSequence = require('./PurchaseOrderSequence');
 
 // User and Token
 User.hasMany(PersonalAccessToken, { foreignKey: 'tokenable_id', constraints: false, scope: { tokenable_type: 'App\\Models\\User' } });
@@ -69,6 +72,18 @@ Dispatch.belongsTo(Carrier, { foreignKey: 'carrier_id', as: 'carrier' });
 // Dispatch and DispatchTracking
 Dispatch.hasMany(DispatchTracking, { foreignKey: 'dispatch_id', as: 'trackingHistory' });
 DispatchTracking.belongsTo(Dispatch, { foreignKey: 'dispatch_id', as: 'dispatch' });
+
+// Supplier and PurchaseOrder
+Supplier.hasMany(PurchaseOrder, { foreignKey: 'supplier_id', as: 'purchaseOrders' });
+PurchaseOrder.belongsTo(Supplier, { foreignKey: 'supplier_id', as: 'supplier' });
+
+// PurchaseOrder and PurchaseOrderItem
+PurchaseOrder.hasMany(PurchaseOrderItem, { foreignKey: 'purchase_order_id', as: 'items' });
+PurchaseOrderItem.belongsTo(PurchaseOrder, { foreignKey: 'purchase_order_id', as: 'purchaseOrder' });
+
+// PurchaseOrderSequence and PurchaseOrder
+PurchaseOrderSequence.hasMany(PurchaseOrder, { foreignKey: 'sequence_id', as: 'purchaseOrders' });
+PurchaseOrder.belongsTo(PurchaseOrderSequence, { foreignKey: 'sequence_id', as: 'sequence' });
 
 // Category and Subcategory
 Category.hasMany(Subcategory, { foreignKey: 'category_id', as: 'subcategories' });
@@ -174,7 +189,7 @@ Product.belongsToMany(Product, {
 });
 
 // Creator and Updater relations
-const auditedModels = [Product, Category, Subcategory, ProductBrand, Brand, VehicleModel, VehicleYear, VehicleDisplacement, Carrier, Article, WorkshopApplication, Tax, Dispatch, Supplier, InvoicingResolution, Invoice];
+const auditedModels = [Product, Category, Subcategory, ProductBrand, Brand, VehicleModel, VehicleYear, VehicleDisplacement, Carrier, Article, WorkshopApplication, Tax, Dispatch, Supplier, InvoicingResolution, Invoice, PurchaseOrder, PurchaseOrderSequence];
 auditedModels.forEach(model => {
   model.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
   model.belongsTo(User, { foreignKey: 'updated_by', as: 'updater' });
@@ -304,4 +319,7 @@ module.exports = {
   InvoicingResolution,
   Invoice,
   InvoiceItem,
+  PurchaseOrder,
+  PurchaseOrderItem,
+  PurchaseOrderSequence,
 };

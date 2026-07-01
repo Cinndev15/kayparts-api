@@ -14,6 +14,7 @@ const genericCrudController = require('../controllers/genericCrudController');
 const dispatchController = require('../controllers/dispatchController');
 const dispatchTrackingController = require('../controllers/dispatchTrackingController');
 const invoiceController = require('../controllers/invoiceController');
+const purchaseOrderController = require('../controllers/purchaseOrderController');
 
 const {
   Category,
@@ -30,7 +31,8 @@ const {
   Article,
   WorkshopApplication,
   Supplier,
-  InvoicingResolution
+  InvoicingResolution,
+  PurchaseOrderSequence
 } = require('../models');
 
 // Configure Multer for product image uploads
@@ -138,6 +140,17 @@ router.get('/invoices', invoiceController.index);
 router.get('/invoices/:id', invoiceController.show);
 router.post('/invoices', invoiceController.store);
 router.post('/invoices/:id/cancel', invoiceController.cancel);
+
+// Purchase Order Sequences CRUD
+registerResource('purchase-order-sequences', genericCrudController(PurchaseOrderSequence, ['name', 'prefix'], [], false));
+
+// Purchase Order routes
+router.get('/purchase-orders', purchaseOrderController.index);
+router.get('/purchase-orders/:id', purchaseOrderController.show);
+router.post('/purchase-orders', purchaseOrderController.store);
+router.put('/purchase-orders/:id', purchaseOrderController.update);
+router.delete('/purchase-orders/:id', purchaseOrderController.destroy);
+router.post('/purchase-orders/:id/send', purchaseOrderController.send);
 
 // Dispatch Tracking routes
 router.get('/dispatches/:dispatchId/tracking', dispatchTrackingController.index);

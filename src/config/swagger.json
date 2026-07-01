@@ -883,6 +883,163 @@
         "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
         "responses": { "200": { "description": "Cancelled successfully" } }
       }
+      }
+    },
+    "/purchase-order-sequences": {
+      "get": {
+        "tags": ["Admin Purchase Orders"],
+        "summary": "List purchase order sequences (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "tags": ["Admin Purchase Orders"],
+        "summary": "Create purchase order sequence (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "prefix", "start_number", "end_number", "current_number"],
+                "properties": {
+                  "name": { "type": "string", "example": "Órdenes de Compra 2026" },
+                  "prefix": { "type": "string", "example": "OC-2026" },
+                  "start_number": { "type": "integer", "example": 1 },
+                  "end_number": { "type": "integer", "example": 9999 },
+                  "current_number": { "type": "integer", "example": 0 },
+                  "is_active": { "type": "boolean", "default": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/purchase-order-sequences/{id}": {
+      "get": {
+        "tags": ["Admin Purchase Orders"],
+        "summary": "Get purchase order sequence (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "put": {
+        "tags": ["Admin Purchase Orders"],
+        "summary": "Update purchase order sequence (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "type": "object", "properties": { "name": { "type": "string" }, "is_active": { "type": "boolean" }, "end_number": { "type": "integer" } } }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Updated" } }
+      },
+      "delete": {
+        "tags": ["Admin Purchase Orders"],
+        "summary": "Delete purchase order sequence (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Deleted" } }
+      }
+    },
+    "/purchase-orders": {
+      "get": {
+        "tags": ["Admin Purchase Orders"],
+        "summary": "List purchase orders (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["draft","sent","confirmed","partial","received","cancelled"] } },
+          { "name": "supplier_id", "in": "query", "schema": { "type": "integer" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "per_page", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "tags": ["Admin Purchase Orders"],
+        "summary": "Create purchase order (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["supplier_id", "items"],
+                "properties": {
+                  "supplier_id": { "type": "integer", "example": 1 },
+                  "expected_delivery_date": { "type": "string", "format": "date", "example": "2026-07-15" },
+                  "notes": { "type": "string", "example": "Entrega urgente" },
+                  "terms": { "type": "string", "example": "Pago a 30 días" },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["description", "quantity", "unit_price"],
+                      "properties": {
+                        "product_id": { "type": "integer" },
+                        "description": { "type": "string", "example": "Filtro de aceite Ref. F-1234" },
+                        "quantity": { "type": "number", "example": 10 },
+                        "unit": { "type": "string", "example": "Unidad" },
+                        "unit_price": { "type": "number", "example": 25000 },
+                        "tax_rate": { "type": "number", "example": 19 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/purchase-orders/{id}": {
+      "get": {
+        "tags": ["Admin Purchase Orders"],
+        "summary": "Get purchase order detail (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "put": {
+        "tags": ["Admin Purchase Orders"],
+        "summary": "Update purchase order draft (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "required": false,
+          "content": { "application/json": { "schema": { "type": "object" } } }
+        },
+        "responses": { "200": { "description": "Updated" } }
+      },
+      "delete": {
+        "tags": ["Admin Purchase Orders"],
+        "summary": "Delete draft purchase order (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Deleted" } }
+      }
+    },
+    "/purchase-orders/{id}/send": {
+      "post": {
+        "tags": ["Admin Purchase Orders"],
+        "summary": "Send purchase order via email to supplier (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { "description": "Email sent successfully" },
+          "422": { "description": "Supplier has no email or invalid state" }
+        }
+      }
     }
   }
 }
