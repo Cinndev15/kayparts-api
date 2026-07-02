@@ -36,6 +36,40 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Register API Routes
 app.use('/api', routes);
 
+app.get('/api/debug-paths', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  try {
+    const cwd = process.cwd();
+    const dirname = __dirname;
+    const parentDir = path.join(__dirname, '../../');
+    const parentContents = fs.existsSync(parentDir) ? fs.readdirSync(parentDir) : [];
+    
+    const uploadsPath = path.join(__dirname, '../public/uploads');
+    const uploadsExists = fs.existsSync(uploadsPath);
+    const uploadsContents = uploadsExists ? fs.readdirSync(uploadsPath) : [];
+
+    const productsPath = path.join(__dirname, '../public/uploads/products');
+    const productsExists = fs.existsSync(productsPath);
+    const productsContents = productsExists ? fs.readdirSync(productsPath) : [];
+
+    res.json({
+      cwd,
+      dirname,
+      parentDir,
+      parentContents,
+      uploadsPath,
+      uploadsExists,
+      uploadsContents,
+      productsPath,
+      productsExists,
+      productsContents
+    });
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});
+
 // Base route test - serve beautiful landing page
 const landingController = require('./controllers/landingController');
 app.get('/', landingController.serveLanding);
