@@ -1,0 +1,13 @@
+id,name,category_id,image_path
+1,Frontal,6,
+2,Persiana,6,
+3,Guardafango,6,
+4,Capot,6,
+5,Bomper Delantero,6,
+6,Bomper Trasero,6,
+7,Puerta,6,
+8,Paso rueda,6,
+9,Farola,7,
+10,Luz Media,7,
+11,Exploradora,7,
+12,Lampara Stop,7,

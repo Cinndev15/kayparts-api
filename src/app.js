@@ -38,6 +38,8 @@ app.use('/uploads', express.static(getUploadsDir()));
 app.use('/api/uploads', express.static(getUploadsDir()));
 app.use('/templates', express.static(path.join(__dirname, '../public/templates')));
 app.use('/api/templates', express.static(path.join(__dirname, '../public/templates')));
+app.use('/exports', express.static(path.join(__dirname, '../public/exports')));
+app.use('/api/exports', express.static(path.join(__dirname, '../public/exports')));
 
 // Swagger Documentation UI
 const swaggerUi = require('swagger-ui-express');
