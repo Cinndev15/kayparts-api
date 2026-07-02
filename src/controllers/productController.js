@@ -12,7 +12,8 @@ const {
   VehicleModel,
   VehicleYear,
   VehicleDisplacement,
-  Tax
+  Tax,
+  Supplier
 } = require('../models');
 
 exports.index = async (req, res) => {
@@ -35,7 +36,8 @@ exports.index = async (req, res) => {
         { model: ProductBrand, as: 'brand' },
         { model: Category, as: 'category' },
         { model: ProductImage, as: 'principalImage' },
-        { model: Tax, as: 'taxes' }
+        { model: Tax, as: 'taxes' },
+        { model: Supplier, as: 'supplier' }
       ],
       order: [['created_at', 'DESC']],
       limit,
@@ -63,7 +65,7 @@ exports.store = async (req, res) => {
       sku, name, description, price, stock, brand_id, category_id, subcategory_id,
       status, condition, spare_type, position, side, transmission, reference, is_featured,
       model_ids, model_id, vehicle_year_ids, vehicle_displacement_ids, compatible_product_ids, tax_ids,
-      criteria, alternate_references, image_labels, principal_image_index
+      criteria, alternate_references, image_labels, principal_image_index, supplier_id
     } = req.body;
 
     if (!sku || !name || !price || !category_id) {
@@ -71,10 +73,30 @@ exports.store = async (req, res) => {
     }
 
     const result = await sequelize.transaction(async (t) => {
+      // Auto-generate KP consecutive code
+      let kpCode = 'KP000001';
+      const lastProduct = await Product.findOne({
+        where: {
+          code: {
+            [Op.like]: 'KP%'
+          }
+        },
+        order: [['code', 'DESC']],
+        transaction: t
+      });
+      if (lastProduct && lastProduct.code) {
+        const match = lastProduct.code.match(/^KP(\d+)$/);
+        if (match) {
+          const lastNum = parseInt(match[1], 10);
+          kpCode = 'KP' + String(lastNum + 1).padStart(6, '0');
+        }
+      }
+
       const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 7);
 
       const product = await Product.create({
-        sku, name, slug, description, price, stock, brand_id, category_id, subcategory_id,
+        sku, code: kpCode, name, slug, description, price, stock, brand_id, category_id, subcategory_id,
+        supplier_id: supplier_id || 1, // Default to INTERNATIONAL PARTS SERVICE SAS (id 1)
         status: status || 'active', condition, spare_type, position, side, transmission, reference,
         is_featured: is_featured === 'true' || is_featured === true,
         created_by: req.user ? req.user.id : null,
@@ -176,7 +198,8 @@ exports.store = async (req, res) => {
         { model: VehicleModel, as: 'vehicleModels' },
         { model: VehicleYear, as: 'vehicleYears' },
         { model: VehicleDisplacement, as: 'vehicleDisplacements' },
-        { model: Tax, as: 'taxes' }
+        { model: Tax, as: 'taxes' },
+        { model: Supplier, as: 'supplier' }
       ]
     });
 
@@ -200,7 +223,8 @@ exports.show = async (req, res) => {
         { model: VehicleModel, as: 'vehicleModels', include: [{ model: Brand, as: 'brand' }] },
         { model: VehicleYear, as: 'vehicleYears' },
         { model: VehicleDisplacement, as: 'vehicleDisplacements' },
-        { model: Tax, as: 'taxes' }
+        { model: Tax, as: 'taxes' },
+        { model: Supplier, as: 'supplier' }
       ]
     });
 
@@ -225,7 +249,7 @@ exports.update = async (req, res) => {
       sku, name, description, price, stock, brand_id, category_id, subcategory_id,
       status, condition, spare_type, position, side, transmission, reference, is_featured,
       model_ids, vehicle_year_ids, vehicle_displacement_ids, compatible_product_ids, tax_ids,
-      criteria, alternate_references, image_labels, principal_image_index
+      criteria, alternate_references, image_labels, principal_image_index, supplier_id
     } = req.body;
 
     await sequelize.transaction(async (t) => {
@@ -243,6 +267,7 @@ exports.update = async (req, res) => {
       if (brand_id !== undefined) updateData.brand_id = brand_id;
       if (category_id !== undefined) updateData.category_id = category_id;
       if (subcategory_id !== undefined) updateData.subcategory_id = subcategory_id;
+      if (supplier_id !== undefined) updateData.supplier_id = supplier_id;
       if (status) updateData.status = status;
       if (condition !== undefined) updateData.condition = condition;
       if (spare_type !== undefined) updateData.spare_type = spare_type;
@@ -337,7 +362,8 @@ exports.update = async (req, res) => {
         { model: VehicleModel, as: 'vehicleModels' },
         { model: VehicleYear, as: 'vehicleYears' },
         { model: VehicleDisplacement, as: 'vehicleDisplacements' },
-        { model: Tax, as: 'taxes' }
+        { model: Tax, as: 'taxes' },
+        { model: Supplier, as: 'supplier' }
       ]
     });
 

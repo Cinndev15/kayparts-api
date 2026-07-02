@@ -778,6 +778,111 @@
           "201": {
             "description": "Created"
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sku": {
+                    "type": "string",
+                    "example": "12345"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Pastillas de Freno delanteras"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Pastillas de alta calidad"
+                  },
+                  "price": {
+                    "type": "number",
+                    "example": 120.5
+                  },
+                  "stock": {
+                    "type": "integer",
+                    "example": 10
+                  },
+                  "brand_id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "category_id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "subcategory_id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "active"
+                  },
+                  "condition": {
+                    "type": "string",
+                    "example": "new"
+                  },
+                  "spare_type": {
+                    "type": "string",
+                    "example": "original"
+                  },
+                  "position": {
+                    "type": "string",
+                    "example": "delantero"
+                  },
+                  "side": {
+                    "type": "string",
+                    "example": "ambos"
+                  },
+                  "transmission": {
+                    "type": "string",
+                    "example": "automatica"
+                  },
+                  "reference": {
+                    "type": "string",
+                    "example": "REF-8822"
+                  },
+                  "is_featured": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "supplier_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "ID del proveedor"
+                  },
+                  "model_ids": {
+                    "type": "string",
+                    "description": "JSON array of model IDs, e.g. [1, 2]"
+                  },
+                  "vehicle_year_ids": {
+                    "type": "string",
+                    "description": "JSON array of year IDs, e.g. [1, 2]"
+                  },
+                  "vehicle_displacement_ids": {
+                    "type": "string",
+                    "description": "JSON array of displacement IDs, e.g. [1, 2]"
+                  },
+                  "tax_ids": {
+                    "type": "string",
+                    "description": "JSON array of tax IDs"
+                  },
+                  "criteria": {
+                    "type": "string",
+                    "description": "JSON array of criteria objects"
+                  },
+                  "alternate_references": {
+                    "type": "string",
+                    "description": "JSON array of string references"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -831,6 +936,70 @@
         "responses": {
           "200": {
             "description": "Updated"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sku": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "number"
+                  },
+                  "stock": {
+                    "type": "integer"
+                  },
+                  "brand_id": {
+                    "type": "integer"
+                  },
+                  "category_id": {
+                    "type": "integer"
+                  },
+                  "subcategory_id": {
+                    "type": "integer"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "condition": {
+                    "type": "string"
+                  },
+                  "spare_type": {
+                    "type": "string"
+                  },
+                  "position": {
+                    "type": "string"
+                  },
+                  "side": {
+                    "type": "string"
+                  },
+                  "transmission": {
+                    "type": "string"
+                  },
+                  "reference": {
+                    "type": "string"
+                  },
+                  "is_featured": {
+                    "type": "boolean"
+                  },
+                  "supplier_id": {
+                    "type": "integer",
+                    "description": "ID del proveedor"
+                  }
+                }
+              }
+            }
           }
         }
       },

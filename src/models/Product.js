@@ -12,6 +12,11 @@ const Product = sequelize.define('Product', {
     allowNull: false,
     unique: true,
   },
+  code: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true,
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -35,6 +40,10 @@ const Product = sequelize.define('Product', {
     defaultValue: 0,
   },
   brand_id: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true,
+  },
+  supplier_id: {
     type: DataTypes.BIGINT.UNSIGNED,
     allowNull: true,
   },

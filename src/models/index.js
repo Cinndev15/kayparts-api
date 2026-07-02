@@ -101,6 +101,10 @@ Product.belongsTo(Subcategory, { foreignKey: 'subcategory_id', as: 'subcategory'
 ProductBrand.hasMany(Product, { foreignKey: 'brand_id', as: 'products' });
 Product.belongsTo(ProductBrand, { foreignKey: 'brand_id', as: 'brand' });
 
+// Product and Supplier
+Supplier.hasMany(Product, { foreignKey: 'supplier_id', as: 'products' });
+Product.belongsTo(Supplier, { foreignKey: 'supplier_id', as: 'supplier' });
+
 // Brand (Vehicle Make) and VehicleModel
 Brand.hasMany(VehicleModel, { foreignKey: 'brand_id', as: 'vehicleModels' });
 VehicleModel.belongsTo(Brand, { foreignKey: 'brand_id', as: 'brand' });
@@ -277,6 +281,9 @@ Product.prototype.toJSON = function () {
   // Format other associations if present
   if (values.brand && this.brand && this.brand.toJSON) {
     values.brand = this.brand.toJSON();
+  }
+  if (values.supplier && this.supplier && this.supplier.toJSON) {
+    values.supplier = this.supplier.toJSON();
   }
   if (values.category && this.category && this.category.toJSON) {
     values.category = this.category.toJSON();
