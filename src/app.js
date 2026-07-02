@@ -50,6 +50,14 @@ app.get('/api/debug-paths', (req, res) => {
     const productsExists = fs.existsSync(productsPath);
     const productsContents = productsExists ? fs.readdirSync(productsPath) : [];
 
+    const publicHtmlUploadsPath = '/home/u691340716/domains/api.kayparts.co/public_html/uploads';
+    const publicHtmlUploadsExists = fs.existsSync(publicHtmlUploadsPath);
+    const publicHtmlUploadsContents = publicHtmlUploadsExists ? fs.readdirSync(publicHtmlUploadsPath) : [];
+
+    const publicHtmlProductsPath = '/home/u691340716/domains/api.kayparts.co/public_html/uploads/products';
+    const publicHtmlProductsExists = fs.existsSync(publicHtmlProductsPath);
+    const publicHtmlProductsContents = publicHtmlProductsExists ? fs.readdirSync(publicHtmlProductsPath) : [];
+
     res.json({
       cwd,
       dirname,
@@ -60,7 +68,13 @@ app.get('/api/debug-paths', (req, res) => {
       uploadsContents,
       productsPath,
       productsExists,
-      productsContents
+      productsContents,
+      publicHtmlUploadsPath,
+      publicHtmlUploadsExists,
+      publicHtmlUploadsContents,
+      publicHtmlProductsPath,
+      publicHtmlProductsExists,
+      publicHtmlProductsContents
     });
   } catch (err) {
     res.json({ error: err.message });
