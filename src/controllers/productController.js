@@ -393,3 +393,204 @@ exports.destroy = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+// Download CSV Import Template
+exports.downloadTemplate = (req, res) => {
+  const headers = [
+    'sku', 'name', 'description', 'price', 'stock', 'brand_id', 'category_id',
+    'subcategory_id', 'supplier_id', 'condition', 'spare_type', 'position',
+    'side', 'transmission', 'reference', 'is_featured', 'model_ids',
+    'vehicle_year_ids', 'vehicle_displacement_ids', 'tax_ids'
+  ];
+  
+  const sampleRow = [
+    'SKU-TEST-001',
+    'Pastillas de Freno Delanteras',
+    'Pastillas de alta friccion y durabilidad para freno de disco',
+    '125000.00',
+    '25',
+    '1', // brand_id
+    '1', // category_id
+    '1', // subcategory_id
+    '1', // supplier_id
+    'new',
+    'original',
+    'delantero',
+    'ambos',
+    'automatica',
+    'REF-5599',
+    'false',
+    '"1,2"', // model_ids
+    '"1"',   // vehicle_year_ids
+    '"1"',   // vehicle_displacement_ids
+    '"1"'    // tax_ids
+  ];
+
+  const csvContent = headers.join(',') + '\n' + sampleRow.join(',') + '\n';
+  
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', 'attachment; filename=kayparts_import_template.csv');
+  return res.status(200).send(csvContent);
+};
+
+// Import products from CSV
+exports.importProducts = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'Debe subir un archivo CSV.' });
+    }
+
+    const fileContent = req.file.buffer.toString('utf8');
+    
+    // Custom CSV parser
+    const parseCSV = (content) => {
+      const lines = content.split(/\r?\n/);
+      if (lines.length === 0) return [];
+      
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
+      const results = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        const values = [];
+        let currentVal = '';
+        let inQuotes = false;
+        for (let j = 0; j < line.length; j++) {
+          const char = line[j];
+          if (char === '"' || char === "'") {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            values.push(currentVal.trim().replace(/^["']|["']$/g, ''));
+            currentVal = '';
+          } else {
+            currentVal += char;
+          }
+        }
+        values.push(currentVal.trim().replace(/^["']|["']$/g, ''));
+        
+        const row = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index] !== undefined ? values[index] : '';
+        });
+        results.push(row);
+      }
+      return results;
+    };
+
+    const rows = parseCSV(fileContent);
+    if (rows.length === 0) {
+      return res.status(400).json({ message: 'El archivo CSV está vacío o es inválido.' });
+    }
+
+    const parseIds = (val) => {
+      if (!val) return [];
+      if (val.startsWith('[') && val.endsWith(']')) {
+        try { return JSON.parse(val); } catch(e) {}
+      }
+      return val.split(',').map(x => parseInt(x.trim(), 10)).filter(x => !isNaN(x));
+    };
+
+    let importedCount = 0;
+    const errors = [];
+
+    await sequelize.transaction(async (t) => {
+      // Find the last consecutive code to start incrementing from
+      let lastKpNum = 0;
+      const lastProduct = await Product.findOne({
+        where: {
+          code: {
+            [Op.like]: 'KP%'
+          }
+        },
+        order: [['code', 'DESC']],
+        transaction: t
+      });
+      
+      if (lastProduct && lastProduct.code) {
+        const match = lastProduct.code.match(/^KP(\d+)$/);
+        if (match) {
+          lastKpNum = parseInt(match[1], 10);
+        }
+      }
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const lineNum = i + 2; // header is line 1
+
+        if (!row.sku || !row.name || !row.price || !row.category_id) {
+          errors.push(`Línea ${lineNum}: sku, name, price y category_id son campos obligatorios.`);
+          continue;
+        }
+
+        // Check if sku already exists
+        const existingSku = await Product.findOne({
+          where: { sku: row.sku },
+          transaction: t
+        });
+        if (existingSku) {
+          errors.push(`Línea ${lineNum}: El SKU '${row.sku}' ya está registrado.`);
+          continue;
+        }
+
+        lastKpNum += 1;
+        const kpCode = 'KP' + String(lastKpNum).padStart(6, '0');
+        const slug = row.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 7);
+
+        const product = await Product.create({
+          sku: row.sku,
+          code: kpCode,
+          name: row.name,
+          slug,
+          description: row.description || null,
+          price: parseFloat(row.price),
+          stock: parseInt(row.stock || 0, 10),
+          brand_id: row.brand_id ? parseInt(row.brand_id, 10) : null,
+          category_id: parseInt(row.category_id, 10),
+          subcategory_id: row.subcategory_id ? parseInt(row.subcategory_id, 10) : null,
+          supplier_id: row.supplier_id ? parseInt(row.supplier_id, 10) : 1, // Defaults to 1
+          condition: row.condition || null,
+          spare_type: row.spare_type || null,
+          position: row.position || null,
+          side: row.side || null,
+          transmission: row.transmission || null,
+          reference: row.reference || null,
+          is_featured: row.is_featured === 'true' || row.is_featured === '1',
+          created_by: req.user ? req.user.id : null
+        }, { transaction: t });
+
+        // Sync Associations
+        if (row.model_ids) {
+          await product.setVehicleModels(parseIds(row.model_ids), { transaction: t });
+        }
+        if (row.vehicle_year_ids) {
+          await product.setVehicleYears(parseIds(row.vehicle_year_ids), { transaction: t });
+        }
+        if (row.vehicle_displacement_ids) {
+          await product.setVehicleDisplacements(parseIds(row.vehicle_displacement_ids), { transaction: t });
+        }
+        if (row.tax_ids) {
+          await product.setTaxes(parseIds(row.tax_ids), { transaction: t });
+        }
+
+        importedCount++;
+      }
+    });
+
+    if (importedCount === 0 && errors.length > 0) {
+      return res.status(422).json({
+        message: 'No se pudo importar ningún producto.',
+        errors
+      });
+    }
+
+    return res.status(200).json({
+      message: `Se importaron ${importedCount} productos exitosamente.`,
+      errors: errors.length > 0 ? errors : undefined
+    });
+
+  } catch (error) {
+    return res.status(500).json({ message: 'Error durante la importación: ' + error.message });
+  }
+};

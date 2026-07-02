@@ -119,6 +119,8 @@ router.put('/orders/:id/status', orderController.updateStatus);
 
 // Product Resource (needs multer upload for store/update)
 router.get('/products', productController.index);
+router.get('/products/import-template', productController.downloadTemplate);
+router.post('/products/import', multer().single('file'), productController.importProducts);
 router.post('/products', upload.array('images'), productController.store);
 router.get('/products/:id', productController.show);
 router.put('/products/:id', upload.array('images'), productController.update);

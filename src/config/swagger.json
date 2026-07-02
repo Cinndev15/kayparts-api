@@ -2303,6 +2303,68 @@
           }
         }
       }
+    },
+    "/products/import-template": {
+      "get": {
+        "tags": [
+          "Admin Products"
+        ],
+        "summary": "Descargar plantilla CSV para importacion masiva de productos (Admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo CSV de plantilla"
+          }
+        }
+      }
+    },
+    "/products/import": {
+      "post": {
+        "tags": [
+          "Admin Products"
+        ],
+        "summary": "Importar productos masivamente desde un archivo CSV (Admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "El archivo CSV que contiene los registros de los productos a importar"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mensaje de éxito detallando cuántos productos fueron importados"
+          },
+          "400": {
+            "description": "Archivo no enviado o estructura inválida"
+          },
+          "422": {
+            "description": "Errores de validación en líneas del CSV"
+          }
+        }
+      }
     }
   },
   "/purchase-order-sequences": {
