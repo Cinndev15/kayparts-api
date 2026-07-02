@@ -33,9 +33,6 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./config/swagger.json');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Register API Routes
-app.use('/api', routes);
-
 app.get('/api/debug-paths', (req, res) => {
   const fs = require('fs');
   const path = require('path');
@@ -69,6 +66,9 @@ app.get('/api/debug-paths', (req, res) => {
     res.json({ error: err.message });
   }
 });
+
+// Register API Routes
+app.use('/api', routes);
 
 // Base route test - serve beautiful landing page
 const landingController = require('./controllers/landingController');
