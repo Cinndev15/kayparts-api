@@ -2365,6 +2365,86 @@
           }
         }
       }
+    },
+    "/brands/export": {
+      "get": {
+        "tags": [
+          "Admin Brands"
+        ],
+        "summary": "Exportar las marcas de vehiculos actuales a un archivo CSV (Admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo CSV con las marcas y sus IDs"
+          }
+        }
+      }
+    },
+    "/vehicle-models/import-template": {
+      "get": {
+        "tags": [
+          "Admin Vehicle Models"
+        ],
+        "summary": "Descargar plantilla CSV para importacion masiva de modelos de vehiculos (Admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo CSV de plantilla para modelos"
+          }
+        }
+      }
+    },
+    "/vehicle-models/import": {
+      "post": {
+        "tags": [
+          "Admin Vehicle Models"
+        ],
+        "summary": "Importar modelos de vehiculos masivamente desde un archivo CSV (Admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "El archivo CSV que contiene los modelos de vehiculos a importar"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mensaje de éxito detallando cuántos modelos fueron importados"
+          },
+          "400": {
+            "description": "Archivo no enviado o estructura inválida"
+          },
+          "422": {
+            "description": "Errores de validación en líneas del CSV"
+          }
+        }
+      }
     }
   },
   "/purchase-order-sequences": {

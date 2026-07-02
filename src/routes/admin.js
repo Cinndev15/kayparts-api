@@ -15,6 +15,7 @@ const dispatchController = require('../controllers/dispatchController');
 const dispatchTrackingController = require('../controllers/dispatchTrackingController');
 const invoiceController = require('../controllers/invoiceController');
 const purchaseOrderController = require('../controllers/purchaseOrderController');
+const vehicleModelController = require('../controllers/vehicleModelController');
 
 const {
   Category,
@@ -134,6 +135,9 @@ registerResource('subcategories', genericCrudController(Subcategory, ['name'], [
 registerResource('sub-categories', genericCrudController(Subcategory, ['name'], [{ model: Category, as: 'category' }], false, 'subcategories'), createUploadMiddleware('subcategories')); // Alias
 registerResource('brands', genericCrudController(Brand, ['name'], [], false, 'brands'), createUploadMiddleware('brands'));
 registerResource('product-brands', genericCrudController(ProductBrand, ['name'], [], false, 'product_brands'), createUploadMiddleware('product_brands'));
+router.get('/brands/export', vehicleModelController.exportBrands);
+router.get('/vehicle-models/import-template', vehicleModelController.downloadTemplate);
+router.post('/vehicle-models/import', multer().single('file'), vehicleModelController.importModels);
 registerResource('vehicle-models', genericCrudController(VehicleModel, ['name'], [{ model: Brand, as: 'brand' }], false, 'vehicle_models'), createUploadMiddleware('vehicle_models'));
 registerResource('taxes', genericCrudController(Tax, ['name'], [], false));
 registerResource('vehicle-years', genericCrudController(VehicleYear, ['year'], [], false));
