@@ -21,6 +21,17 @@ const {
   Article
 } = require('../models');
 
+// Helper to get full image URL
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  const baseUrl = process.env.APP_URL || 'https://api.kayparts.co';
+  const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  return `${cleanBase}/uploads/${imagePath}`;
+};
+
 // Helper to format Product JSON exactly like ProductResource in Laravel
 function formatProduct(product) {
   const data = product.toJSON ? product.toJSON() : product;
@@ -29,7 +40,8 @@ function formatProduct(product) {
   let mainImageUrl = null;
   if (data.images && data.images.length > 0) {
     const primary = data.images.find(img => img.is_primary);
-    mainImageUrl = primary ? primary.image_url : data.images[0].image_url;
+    const imgObj = primary || data.images[0];
+    mainImageUrl = imgObj.image_url || getImageUrl(imgObj.image_path);
   }
 
   // Calculate price with taxes
@@ -43,6 +55,7 @@ function formatProduct(product) {
   return {
     id: data.id,
     sku: data.sku,
+    code: data.code,
     name: data.name,
     slug: data.slug,
     description: data.description,
