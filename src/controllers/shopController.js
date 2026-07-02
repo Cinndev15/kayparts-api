@@ -27,9 +27,12 @@ const getImageUrl = (imagePath) => {
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
     return imagePath;
   }
-  const baseUrl = process.env.APP_URL || 'https://api.kayparts.co';
+  let baseUrl = process.env.APP_URL || 'https://api.kayparts.co';
+  if (baseUrl.includes('127.0.0.1') || baseUrl.includes('localhost')) {
+    baseUrl = 'https://api.kayparts.co';
+  }
   const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-  return `${cleanBase}/uploads/${imagePath}`;
+  return `${cleanBase}/api/uploads/${imagePath}`;
 };
 
 // Helper to format Product JSON exactly like ProductResource in Laravel

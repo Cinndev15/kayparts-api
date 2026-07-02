@@ -24,8 +24,9 @@ app.use(express.json({
 app.use(express.urlencoded({ extended: true }));
 
 // Serve Uploads as static files
-// Exposes '/uploads' to match Laravel asset('uploads/...') mapping
+// Exposes '/uploads' and '/api/uploads' to match Laravel asset('uploads/...') mapping and route via proxy
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+app.use('/api/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // Swagger Documentation UI
 const swaggerUi = require('swagger-ui-express');
