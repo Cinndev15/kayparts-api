@@ -1,0 +1,6 @@
+name,brand_id,image_path
+Prado,1,vehicle_models/prado.png
+Hilux,1,vehicle_models/hilux.png
+Logan,2,vehicle_models/logan.png
+Mazda 3,3,vehicle_models/mazda3.png
+Sportage,4,vehicle_models/sportage.png

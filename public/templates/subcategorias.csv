@@ -1,0 +1,6 @@
+name,category_id,image_path
+Pastillas de Freno,1,subcategories/pastillas.png
+Discos de Freno,1,subcategories/discos.png
+Amortiguadores,3,subcategories/amortiguadores.png
+Filtro de Aceite,4,subcategories/filtro_aceite.png
+Bujias,5,subcategories/bujias.png

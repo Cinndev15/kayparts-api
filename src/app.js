@@ -36,6 +36,8 @@ const getUploadsDir = () => {
 };
 app.use('/uploads', express.static(getUploadsDir()));
 app.use('/api/uploads', express.static(getUploadsDir()));
+app.use('/templates', express.static(path.join(__dirname, '../public/templates')));
+app.use('/api/templates', express.static(path.join(__dirname, '../public/templates')));
 
 // Swagger Documentation UI
 const swaggerUi = require('swagger-ui-express');
