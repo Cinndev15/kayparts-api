@@ -25,8 +25,17 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve Uploads as static files
 // Exposes '/uploads' and '/api/uploads' to match Laravel asset('uploads/...') mapping and route via proxy
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
-app.use('/api/uploads', express.static(path.join(__dirname, '../public/uploads')));
+const getUploadsDir = () => {
+  const fs = require('fs');
+  const path = require('path');
+  const prodBase = '/home/u691340716/domains/api.kayparts.co/public_html/uploads';
+  if (fs.existsSync('/home/u691340716/domains/api.kayparts.co/public_html')) {
+    return prodBase;
+  }
+  return path.join(__dirname, '../public/uploads');
+};
+app.use('/uploads', express.static(getUploadsDir()));
+app.use('/api/uploads', express.static(getUploadsDir()));
 
 // Swagger Documentation UI
 const swaggerUi = require('swagger-ui-express');

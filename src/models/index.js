@@ -210,7 +210,7 @@ const getImageUrl = (imagePath) => {
     baseUrl = 'https://api.kayparts.co';
   }
   const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-  return `${cleanBase}/api/uploads/${imagePath}`;
+  return `${cleanBase}/uploads/${imagePath}`;
 };
 
 // Add helper properties/methods to models to align output with Laravel

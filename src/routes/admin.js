@@ -35,10 +35,18 @@ const {
   PurchaseOrderSequence
 } = require('../models');
 
+const getUploadPath = (subfolder) => {
+  const prodBase = '/home/u691340716/domains/api.kayparts.co/public_html/uploads';
+  if (fs.existsSync('/home/u691340716/domains/api.kayparts.co/public_html')) {
+    return path.join(prodBase, subfolder);
+  }
+  return path.join(__dirname, `../../public/uploads/${subfolder}`);
+};
+
 // Configure Multer for product image uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '../../public/uploads/products');
+    const uploadPath = getUploadPath('products');
     fs.mkdirSync(uploadPath, { recursive: true });
     cb(null, uploadPath);
   },
@@ -53,7 +61,7 @@ const upload = multer({ storage });
 const createUploadMiddleware = (subfolder) => {
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      const uploadPath = path.join(__dirname, `../../public/uploads/${subfolder}`);
+      const uploadPath = getUploadPath(subfolder);
       fs.mkdirSync(uploadPath, { recursive: true });
       cb(null, uploadPath);
     },
